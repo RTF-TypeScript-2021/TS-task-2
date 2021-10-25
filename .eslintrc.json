@@ -1,0 +1,46 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true,
+        "es2017": true
+    },
+    "root": true,
+    "overrides": [
+        {
+            "files": [
+                "*.ts",
+                "*.tsx"
+            ],
+            "parserOptions": {
+                "project": "./tsconfig.json"
+            },
+            "extends": [
+                "eslint:recommended",
+                "plugin:@typescript-eslint/eslint-recommended",
+                "plugin:@typescript-eslint/recommended",
+                "plugin:@typescript-eslint/recommended-requiring-type-checking"
+            ],
+            "rules": {
+                "camelcase": "error",
+                "no-unreachable": "error",
+                "curly": ["error"],
+                "no-mixed-spaces-and-tabs": "error",
+                "brace-style": "error",
+                "indent": "error",
+                "padding-line-between-statements": [
+                    "error", {
+                        "blankLine": "always", "prev": "*", "next": "return" }
+                ],
+                "eqeqeq": "error",
+                "prefer-const": "error"
+            }
+        }
+    ],
+    "ignorePatterns": [
+        "specs/*.ts"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "@typescript-eslint"
+    ]
+}

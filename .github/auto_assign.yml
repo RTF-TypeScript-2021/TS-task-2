@@ -1,0 +1,19 @@
+addReviewers: false
+
+# Set to true to add assignees to pull requests
+addAssignees: true
+
+# A list of reviewers to be added to pull requests (GitHub user name)
+assignees:
+  - abrosimov-artsofte
+  - daleunixal
+  - flashart92
+  - maffas
+  - sadyan42
+  - brskiy
+  - loozmax
+
+
+# A number of reviewers added to the pull request
+# Set 0 to add all the reviewers (default: 0)
+numberOfReviewers: 1
