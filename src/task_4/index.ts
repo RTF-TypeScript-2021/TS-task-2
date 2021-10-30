@@ -15,16 +15,25 @@
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
 */
 
-import { Currency } from '../enums';
+import {Currency} from '../enums';
+import {IMoneyUnit, MoneyRepository} from "../task_1";
 
 export class CurrencyConverterModule {
-	private _moneyRepository: any;
+	private _moneyRepository: MoneyRepository;
+	private _usdToRub = 70;
 
-	constructor(initialMoneyRepository: any) {
+	constructor(initialMoneyRepository: MoneyRepository) {
 		this._moneyRepository = initialMoneyRepository;
 	}
 
-	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: any): any {
-
+	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
+		if (fromCurrency === toCurrency) {
+			return 0;
+		}
+		if (toCurrency === Currency.RUB) {
+			return parseInt(moneyUnits.moneyInfo.denomination) * moneyUnits.count * this._usdToRub;
+		} else {
+			return parseInt(moneyUnits.moneyInfo.denomination) * moneyUnits.count / this._usdToRub;
+		}
 	}
 }
