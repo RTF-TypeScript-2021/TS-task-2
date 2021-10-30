@@ -17,33 +17,65 @@
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
 */
 
-import { UserSettingOptions } from '../enums';
+import {UserSettingOptions} from '../enums';
+import {BankOffice, IBankUser} from '../task_2';
 
 export class UserSettingsModule {
-	private _bankOffice: any;
-	private _user: any;
+	private _bankOffice: BankOffice;
+	private _user: IBankUser;
 
-	public set user(user: any) {
-		this._user = user;
+	public set user(user: IBankUser) {
+	    this._user = user;
 	}
 
-	constructor(initialBankOffice: any) {
-		this._bankOffice = initialBankOffice;
+	public get user() {
+		return this._user;
 	}
 
-	private changeUserName(newName: any): any {
-
+	public get bankOffice() {
+		return this._bankOffice;
 	}
 
-	private changeUserSurname(newSurname: any): any {
-
+	constructor(initialBankOffice: BankOffice) {
+	    this._bankOffice = initialBankOffice;
 	}
 
-	private registerForUserNewCard(newCardId: any): any {
-
+	private changeUserName(newName: string): boolean {
+	    if(this.user && this.user.name !== newName){
+	        this.user.name = newName
+			
+			return true
+		}
+		return false
 	}
 
-	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: any): any {
+	private changeUserSurname(newSurname: string): boolean {
+		if(this.user && this.user.surname !== newSurname){
+			this.user.surname = newSurname
 
+			return true
+		}
+		return false
+	}
+
+	private registerForUserNewCard(newCardId: string): boolean {
+		if(!this.bankOffice.isCardTiedToUser(newCardId) && this.bankOffice.getCardById(newCardId)){
+			this.user.cards.push(this.bankOffice.getCardById(newCardId))
+
+			return true
+		}
+
+		return false
+	}
+
+	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
+		switch (option){
+			case UserSettingOptions.name:
+				return this.changeUserName(argsForChangeFunction)
+			case UserSettingOptions.surname:
+				return  this.changeUserSurname(argsForChangeFunction)
+			case UserSettingOptions.newCard:
+				return this.registerForUserNewCard(argsForChangeFunction)
+		}
 	}
 }

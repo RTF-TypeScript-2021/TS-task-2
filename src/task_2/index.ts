@@ -28,27 +28,31 @@ export interface IBankUser {
 	id: string;
 	name: string;
 	surname: string;
-	cards: Array<ICard>;
+	cards?: Array<ICard>;
 }
 
 export class BankOffice {
-	private _users: any;
-	private _cards: any;
+	private _users: Array<IBankUser>;
+	private _cards: Array<ICard>;
 
-	constructor(users: any, cards: any) {
+	constructor(users: Array<IBankUser>, cards: Array<ICard>) {
 		this._users = users;
 		this._cards = cards;
 	}
 
-	public authorize(userId: any, cardId: any, cardPin: any): any {
-
+	get users(){ // для пятой таски
+		return this._users
 	}
 
-	public getCardById(cardId: any): any {
-
+	public authorize(userId: string, cardId: string, cardPin: string): boolean {
+		return this._users.find(x => x.id === userId)?.cards.find(x => x.id === cardId)?.pin === cardPin
 	}
 
-	public isCardTiedToUser(cardId: any): any {
+	public getCardById(cardId: string): ICard {
+		return this._cards.find(x => x.id === cardId)
+	}
 
+	public isCardTiedToUser(cardId: string): boolean {
+		return !!this._users.find(x => x.cards.find(x => x.id === cardId))
 	}
 }

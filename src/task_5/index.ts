@@ -16,8 +16,8 @@
 */
 
 import { Currency, UserSettingOptions } from '../enums';
-import { MoneyRepository } from '../task_1';
-import { BankOffice, IBankUser } from '../task_2';
+import {IMoneyUnit, MoneyRepository} from '../task_1';
+import {BankOffice, IBankUser, ICard} from '../task_2';
 import { UserSettingsModule } from '../task_3';
 import { CurrencyConverterModule } from '../task_4';
 
@@ -27,31 +27,54 @@ export class BankTerminal {
 	private _userSettingsModule: UserSettingsModule;
 	private _currencyConverterModule: CurrencyConverterModule;
 	private _authorizedUser: IBankUser;
+	private _targetCard: ICard
 
-	constructor(initBankOffice: any, initMoneyRepository: any) {
+	constructor(initBankOffice: BankOffice, initMoneyRepository: MoneyRepository) {
 		this._moneyRepository = initMoneyRepository;
 		this._bankOffice = initBankOffice;
 		this._userSettingsModule = new UserSettingsModule(initBankOffice);
 		this._currencyConverterModule = new CurrencyConverterModule(initMoneyRepository);
 	}
 
-	public authorizeUser(user: any, card: any, cardPin: any): any {
+	public authorizeUser(user: IBankUser, card: ICard, cardPin: string): any {
+		if(this._bankOffice.authorize(user.id, card.id, cardPin)){
+			this._authorizedUser = user
+			this._targetCard = card
+			this._userSettingsModule.user = user
 
+			return true
+		}
+
+		return false
 	}
 
-	public takeUsersMoney(moneyUnits: any): any {
 
+
+	public takeUsersMoney(moneyUnits: Array<IMoneyUnit>): boolean {
+		if (this._authorizedUser) {
+			this._targetCard.balance += this._currencyConverterModule.calculateSum(moneyUnits, this._targetCard.currency)
+			return this._moneyRepository.takeMoney(moneyUnits)
+		}
 	}
 
-	public giveOutUsersMoney(count: any): any {
-
+	public giveOutUsersMoney(count: number): boolean {
+		let buffer: boolean | IMoneyUnit[]
+		if(this._authorizedUser || this._targetCard.balance >= count){
+			buffer = this._moneyRepository.giveOutMoney(count, this._targetCard.currency,true)
+		}
+		else return false
+		if (typeof (buffer) === 'boolean'){
+			return false
+		}
+		this._targetCard.balance -= this._currencyConverterModule.calculateSum(buffer, this._targetCard.currency)
+		return true
 	}
 
-	public changeAuthorizedUserSettings(option: UserSettingOptions, argsForChangeFunction: any): any {
-		
+	public changeAuthorizedUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
+		return this._userSettingsModule.changeUserSettings(option, argsForChangeFunction)
 	}
 
-	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: any): any {
-
+	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
+		return this._currencyConverterModule.convertMoneyUnits(fromCurrency, toCurrency, moneyUnits)
 	}
 }

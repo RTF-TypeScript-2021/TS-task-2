@@ -15,16 +15,40 @@
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
 */
 
-import { Currency } from '../enums';
+import {Currency} from '../enums';
+import {IMoneyUnit, MoneyRepository} from "../task_1";
 
 export class CurrencyConverterModule {
-	private _moneyRepository: any;
+	private _moneyRepository: MoneyRepository;
 
-	constructor(initialMoneyRepository: any) {
+	constructor(initialMoneyRepository: MoneyRepository) {
 		this._moneyRepository = initialMoneyRepository;
 	}
 
-	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: any): any {
+	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
+		if(fromCurrency === toCurrency || toCurrency === moneyUnits.moneyInfo.currency || this.calculateSum(this._moneyRepository.repository, toCurrency) >= this.calculateSum([moneyUnits], moneyUnits.moneyInfo.currency)){
+			return 0
+		}
+		const resultCount =  moneyUnits.moneyInfo.currency === Currency.RUB? moneyUnits.count*parseInt(moneyUnits.moneyInfo.denomination)/70 : moneyUnits.count*parseInt(moneyUnits.moneyInfo.denomination)*70
+		const denomination = toCurrency === Currency.RUB? '10' : '1'
+		moneyUnits = {
+			moneyInfo:{
+				denomination: denomination,
+				currency: toCurrency
+			},
+			count: resultCount/parseInt(denomination)
+		}
+		return resultCount
+	}
 
+	public calculateSum(moneyUnits: Array<IMoneyUnit>, currency: Currency): number{
+		let sum = 0
+		moneyUnits.forEach( x =>{
+			if (x.moneyInfo.currency === currency) {
+				sum += x.count * parseInt(x.moneyInfo.denomination)
+			}
+		})
+
+		return sum
 	}
 }

@@ -30,18 +30,78 @@ export interface IMoneyUnit {
     count: number;
 }
 
-export class MoneyRepository {
-    private _repository: any;
+interface IDenominationInfo {
+    denomination: string,
+    count: number
+}
 
-    constructor(initialRepository: any) {
+export class MoneyRepository {
+    private _repository: Array<IMoneyUnit>;
+
+    constructor(initialRepository: Array<IMoneyUnit>) {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: any, currency: any): any {
-
+    get repository(){
+        return this._repository
     }
 
-    public takeMoney(moneyUnits: any): any {
+    public takeMoney(moneyUnits: Array<IMoneyUnit>): boolean{ //Сначала было void, но пятый таск требует boolean, поэтому испрвил тут, ситуации с неудачей и возратом false не нашёл
+        moneyUnits.forEach(moneyUnit => {
+            let taken = false
+            this._repository.forEach(money =>{
+                if(money.moneyInfo.currency === moneyUnit.moneyInfo.currency && money.moneyInfo.denomination === moneyUnit.moneyInfo.denomination){
+                    money.count += moneyUnit.count
+                    taken = true
+                }
+            })
+            if(!taken){
+                this._repository.push({ moneyInfo: { denomination: moneyUnit.moneyInfo.denomination, currency: moneyUnit.moneyInfo.currency }, count: moneyUnit.count })
+            }
+        })
+        return true
+    }
 
+    public giveOutMoney(count: number, currency: Currency, terminal? : boolean): boolean | Array<IMoneyUnit>{
+        const moneyBuffer: Array<IMoneyUnit> = []
+        const currencyInMoneyRepository = this.currencyInfo(currency)
+        currencyInMoneyRepository.forEach(money =>{
+            const countBill = Math.floor(count/parseInt(money.denomination))
+            if(countBill){
+                if(countBill >= money.count){
+                    this._repository = this._repository.filter(x => x.moneyInfo.denomination !== money.denomination || x.moneyInfo.currency !== currency)
+                    moneyBuffer.push({moneyInfo:{denomination: money.denomination, currency: currency}, count: money.count })
+                    count -= money.count*parseInt(money.denomination)
+                }else{
+                    this._repository.find(x => x.moneyInfo.denomination === money.denomination && x.moneyInfo.currency === currency)
+                        .count = money.count - countBill
+                    moneyBuffer.push({moneyInfo:{denomination: money.denomination, currency: currency}, count: money.count - countBill })
+                    count -= countBill*parseInt(money.denomination)
+                }
+            }
+        })
+
+        if(count !== 0){
+            this.takeMoney(moneyBuffer)
+
+            return false
+        }
+        if (terminal){ // для пятой таски
+            return moneyBuffer
+        }
+
+        return true
+    }
+
+    private currencyInfo(currency: Currency): Array<IDenominationInfo>{
+        const info: Array<IDenominationInfo> = []
+        this._repository.forEach(money => {
+            if(money.moneyInfo.currency === currency){
+                info.push({ denomination: money.moneyInfo.denomination, count: money.count})
+            }
+        })
+        info.sort((a,b) => parseInt(b.denomination) - parseInt(a.denomination))
+
+        return info
     }
 }
