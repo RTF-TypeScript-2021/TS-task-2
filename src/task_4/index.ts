@@ -26,7 +26,8 @@ export class CurrencyConverterModule {
 	}
 
 	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
-		if(fromCurrency === toCurrency || toCurrency === moneyUnits.moneyInfo.currency || this.calculateSum(this._moneyRepository.repository, toCurrency) >= this.calculateSum([moneyUnits], moneyUnits.moneyInfo.currency)){
+		if(fromCurrency === toCurrency || toCurrency === moneyUnits.moneyInfo.currency ||
+			this.calculateSum(this._moneyRepository.repository, toCurrency) < this.calculateSum([moneyUnits], fromCurrency)){
 			return 0
 		}
 		const resultCount =  moneyUnits.moneyInfo.currency === Currency.RUB? moneyUnits.count*parseInt(moneyUnits.moneyInfo.denomination)/70 : moneyUnits.count*parseInt(moneyUnits.moneyInfo.denomination)*70
@@ -49,6 +50,6 @@ export class CurrencyConverterModule {
 			}
 		})
 
-		return sum
+		return currency === Currency.USD? sum*70: sum
 	}
 }

@@ -15,11 +15,11 @@
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
 */
 
-import { Currency, UserSettingOptions } from '../enums';
+import {Currency, UserSettingOptions} from '../enums';
 import {IMoneyUnit, MoneyRepository} from '../task_1';
 import {BankOffice, IBankUser, ICard} from '../task_2';
-import { UserSettingsModule } from '../task_3';
-import { CurrencyConverterModule } from '../task_4';
+import {UserSettingsModule} from '../task_3';
+import {CurrencyConverterModule} from '../task_4';
 
 export class BankTerminal {
 	private _bankOffice: BankOffice;
@@ -52,7 +52,7 @@ export class BankTerminal {
 
 	public takeUsersMoney(moneyUnits: Array<IMoneyUnit>): boolean {
 		if (this._authorizedUser) {
-			this._targetCard.balance += this._currencyConverterModule.calculateSum(moneyUnits, this._targetCard.currency)
+			this._targetCard.balance += this._targetCard.currency === Currency.USD? this._currencyConverterModule.calculateSum(moneyUnits, this._targetCard.currency)/70 : this._currencyConverterModule.calculateSum(moneyUnits, this._targetCard.currency)
 			return this._moneyRepository.takeMoney(moneyUnits)
 		}
 	}
@@ -66,7 +66,7 @@ export class BankTerminal {
 		if (typeof (buffer) === 'boolean'){
 			return false
 		}
-		this._targetCard.balance -= this._currencyConverterModule.calculateSum(buffer, this._targetCard.currency)
+		this._targetCard.balance -= this._targetCard.currency === Currency.USD? this._currencyConverterModule.calculateSum(buffer, this._targetCard.currency)/70 : this._currencyConverterModule.calculateSum(buffer, this._targetCard.currency)
 		return true
 	}
 
