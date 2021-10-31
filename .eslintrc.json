@@ -26,7 +26,7 @@
                 "curly": ["error"],
                 "no-mixed-spaces-and-tabs": "error",
                 "brace-style": "error",
-                "indent": ["error", 4],
+                //"indent": ["error", "tab"],
                 "padding-line-between-statements": [
                     "error", {
                         "blankLine": "always", "prev": "*", "next": "return" }
