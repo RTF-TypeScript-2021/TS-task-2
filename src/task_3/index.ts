@@ -11,39 +11,65 @@
  * 			 Карта считается успешно привязанной, если она существует и она не привязана ни к одному пользователю
  * 			 возвращает true, если операция удалась и false в ином случае
  * 		1.4) changeUserSettings - управляющий метод
- * 			 который возвращает резльтат работы одного из методов из 1.1 - 1.3
+ * 			 который возвращает результат работы одного из методов из 1.1 - 1.3
  * 			 на основе переданных аргументов
  * 2) Типизировать все свойства и методы класса UserSettingsModule,
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
 */
 
-import { UserSettingOptions } from '../enums';
+import {UserSettingOptions} from '../enums';
+import {BankOffice, IBankUser, ICard} from "../task_2";
 
 export class UserSettingsModule {
-	private _bankOffice: any;
-	private _user: any;
+	private readonly _bankOffice: BankOffice;
+	private _user: IBankUser;
 
-	public set user(user: any) {
-		this._user = user;
+	public set user(user: IBankUser) {
+	    this._user = user;
 	}
 
-	constructor(initialBankOffice: any) {
-		this._bankOffice = initialBankOffice;
+	constructor(initialBankOffice: BankOffice) {
+	    this._bankOffice = initialBankOffice;
 	}
 
-	private changeUserName(newName: any): any {
+	private changeUserName(newName: string): boolean {
+	    if (!this._user || newName === this._user.name){
+	        return false
+	    }
+	    this._user.name = newName;
 
+	    return true;
 	}
 
-	private changeUserSurname(newSurname: any): any {
+	private changeUserSurname(newSurname: string): boolean {
+	    if (!this._user || newSurname === this._user.surname){
+	        return false;
+	    }
+	    this._user.surname = newSurname;
 
+	    return true;
 	}
 
-	private registerForUserNewCard(newCardId: any): any {
+	private registerForUserNewCard(newCardId: string): boolean {
+	    const card: ICard = this._bankOffice.getCardById(newCardId);
 
+	    if (this._bankOffice.isCardTiedToUser(newCardId) || !card){
+	        return false;
+	    }
+	    this._user.cards.push(card)
+
+	    return true;
 	}
 
-	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: any): any {
+	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
+	    if (option === UserSettingOptions.name){
+	        return this.changeUserName(argsForChangeFunction);
+	    } else if (option === UserSettingOptions.surname){
+	        return this.changeUserSurname(argsForChangeFunction);
+	    } else if (option === UserSettingOptions.newCard){
+	        return this.registerForUserNewCard(argsForChangeFunction);
+	    }
 
+	    return false;
 	}
 }

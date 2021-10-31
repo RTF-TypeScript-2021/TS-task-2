@@ -4,12 +4,12 @@
  * Карты могут иметь своего владельца, а могут не иметь.
  * Требуется:
  * 1) Реализовать классу BankOffice 3 метода:
- * 		1.1) authorize - позволяет авторизировать пользователя:
- * 			 Пользователь считается авторизованым, если карта принадлежит ему и пин-код введен корректно
+ * 		1.1) authorize - позволяет авторизовать пользователя:
+ * 			 Пользователь считается авторизованным, если карта принадлежит ему и пин-код введен корректно
  * 			 Принимает аргументы userId - id пользователя, cardId - id банковской карты, cardPin - пин-код карты
  * 			 Если пользователь был успешно авторизован, то метод возвращает true, иначе false
  * 		1.2) getCardById - позволяет получить объект банковской карты из хранилища по id карты
- *		1.3) isCardTiedToUser - позволяет по id карты узнать, привзяана ли карта к какому-нибудь пользователю
+ *		1.3) isCardTiedToUser - позволяет по id карты узнать, привязана ли карта к какому-нибудь пользователю
  *			 возвращает true - если карта привязана к какому-нибудь пользователю, false в ином случае
  * 2) Типизировать все свойства и методы класса MoneyRepository,
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
@@ -28,27 +28,27 @@ export interface IBankUser {
 	id: string;
 	name: string;
 	surname: string;
-	cards: Array<ICard>;
+	cards: ICard[];
 }
 
 export class BankOffice {
-	private _users: any;
-	private _cards: any;
+	private readonly _users: IBankUser[];
+	private readonly _cards: ICard[];
 
-	constructor(users: any, cards: any) {
-		this._users = users;
-		this._cards = cards;
+	constructor(users: IBankUser[], cards: ICard[]) {
+	    this._users = users;
+	    this._cards = cards;
 	}
 
-	public authorize(userId: any, cardId: any, cardPin: any): any {
-
+	public authorize(userId: string, cardId: string, cardPin: string): boolean {
+	    return this._users.find(user => user.id === userId)?.cards.find(card => card.id === cardId)?.pin === cardPin;
 	}
 
-	public getCardById(cardId: any): any {
-
+	public getCardById(cardId: string): ICard {
+	    return this._cards.find(card => card.id === cardId);
 	}
 
-	public isCardTiedToUser(cardId: any): any {
-
+	public isCardTiedToUser(cardId: string): boolean {
+	    return this._users.some(user => user.cards.some(card => card.id === cardId));
 	}
 }

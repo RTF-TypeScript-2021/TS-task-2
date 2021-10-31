@@ -10,21 +10,28 @@
  *			 из которой происходит конвертация
  *	  Метод должен возвращать набор денежных единиц в той валюте, в которую происходит конвертация
  *	  Для простоты реализации будем считать, что банкомат конвертирует только по курсу
- *	  1USD = 70RUB и кратные курсу суммы (т.е. банкомат не может сконвертировать 100RUB, может только 70, 140 и т.д.)
+ *	  1USD = 70RUB и кратные курсу суммы (т.е. банкомат не может конвертировать 100RUB, может только 70, 140 и т.д.)
  * 2) Типизировать все свойства и методы класса UserSettingsModule,
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
 */
 
-import { Currency } from '../enums';
+import {Currency} from '../enums';
+import {IMoneyUnit, MoneyRepository} from "../task_1";
 
 export class CurrencyConverterModule {
-	private _moneyRepository: any;
+	private readonly _moneyRepository: MoneyRepository;
+	private readonly _rubsInUsd = 70;
 
-	constructor(initialMoneyRepository: any) {
-		this._moneyRepository = initialMoneyRepository;
+	constructor(initialMoneyRepository: MoneyRepository) {
+	    this._moneyRepository = initialMoneyRepository;
 	}
 
-	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: any): any {
+	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnit: IMoneyUnit): number {
+	    if (fromCurrency === toCurrency || moneyUnit.moneyInfo.currency !== fromCurrency){
+	        return 0;
+	    }
+	    const rate: number = fromCurrency === Currency.USD ? this._rubsInUsd : 1 / this._rubsInUsd;
 
+	    return moneyUnit.count * parseInt(moneyUnit.moneyInfo.denomination) * rate;
 	}
 }

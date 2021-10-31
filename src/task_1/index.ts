@@ -31,17 +31,63 @@ export interface IMoneyUnit {
 }
 
 export class MoneyRepository {
-    private _repository: any;
+    private readonly _repository: IMoneyUnit[];
 
-    constructor(initialRepository: any) {
+    constructor(initialRepository: IMoneyUnit[]) {
         this._repository = initialRepository;
     }
+    // https://github.com/codedokode/pasta/blob/master/algorithm/atm.md#алгоритм-на-основе-динамического-программирования
+    private isGivenOutMoney(count: number, currency: Currency): [boolean, {[key: number]: IMoneyUnit }]{
+        const availableUnits: IMoneyUnit[] = this._repository.filter(unit => unit.moneyInfo.currency === currency && unit.count > 0);
+        availableUnits.sort((a, b) => parseInt(b.moneyInfo.denomination) - parseInt(a.moneyInfo.denomination));
+        const sums: {[key: number]: IMoneyUnit } = {0: {count:0, moneyInfo: {currency: currency, denomination: "0"}}};
 
-    public giveOutMoney(count: any, currency: any): any {
+        for(let i = 0; i < availableUnits.length; i++){
+            for(let j = 0; j < availableUnits[i].count; j++){
+                const newSums: {[key: number]: IMoneyUnit} = {};
+                for (const sum in sums){
+                    const newSum = parseInt(sum) + parseInt(availableUnits[i].moneyInfo.denomination);
+                    if (newSum > count){
+                        break;
+                    }
+                    if (!(newSum in sums)){
+                        newSums[newSum] = availableUnits[i];
+                    }
+                }
+                for(const sum in newSums){
+                    sums[sum] = newSums[sum];
+                }
+            }
+        }
 
+        return [count in sums, sums];
     }
 
-    public takeMoney(moneyUnits: any): any {
+    public giveOutMoney(count: number, currency: Currency): boolean {
+        const [isGivenOutMoney, sums] = this.isGivenOutMoney(count, currency);
 
+        if (isGivenOutMoney){
+            let moneyUnit = sums[count];
+            while (moneyUnit.count !== 0){
+                moneyUnit.count -= 1;
+                moneyUnit = sums[count - parseInt(moneyUnit.moneyInfo.denomination)];
+            }
+        }
+
+        return isGivenOutMoney;
+    }
+
+    public takeMoney(moneyUnits: IMoneyUnit[]): void {
+        moneyUnits.forEach(newMoneyUnit => {
+            const moneyUnitInRepo: IMoneyUnit = this._repository.find(moneyUnitInRepo =>
+                moneyUnitInRepo.moneyInfo.denomination === newMoneyUnit.moneyInfo.denomination
+                && moneyUnitInRepo.moneyInfo.currency === newMoneyUnit.moneyInfo.currency);
+
+            if (moneyUnitInRepo === undefined){
+                this._repository.push(newMoneyUnit);
+            } else {
+                moneyUnitInRepo.count += newMoneyUnit.count;
+            }
+        })
     }
 }
