@@ -18,7 +18,7 @@
  *      пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
  */
 
-import { Currency } from '../enums';
+import {Currency} from '../enums';
 
 interface IMoneyInfo {
     denomination: string;
@@ -31,17 +31,51 @@ export interface IMoneyUnit {
 }
 
 export class MoneyRepository {
-    private _repository: any;
+    private readonly _repository: Record<number, Record<string, number>>;
+    private readonly _balance: Record<number, number>;
 
-    constructor(initialRepository: any) {
-        this._repository = initialRepository;
+    constructor(initialRepository: IMoneyUnit[]) {
+        this._repository = {
+            [Currency.RUB]: {},
+            [Currency.USD]: {}
+        }
+        this._balance = {
+            [Currency.RUB]: 0,
+            [Currency.USD]: 0
+        };
+        this.takeMoney(initialRepository);
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(count: number, currency: Currency): boolean {
+        if (count > this._balance[currency]) {
+            return false;
+        }
 
+        this._balance[currency] -= count;
+        while (count !== 0) {
+            let dif = 1000000000;
+            let cur = "";
+            for (const m in this._repository[currency]) {
+                if (this._repository[currency][m] > 0
+                    && dif > count - Number.parseInt(m) && count - Number.parseInt(m) >= 0) {
+                    dif = count - Number.parseInt(m);
+                    cur = m;
+                }
+            }
+            count -= Number.parseInt(cur);
+            this._repository[currency][cur] -= 1;
+        }
+
+        return true;
     }
 
-    public takeMoney(moneyUnits: any): any {
-
+    public takeMoney(moneyUnits: IMoneyUnit[]): void {
+        moneyUnits.forEach(m => {
+            if ((Object.keys(this._repository[m.moneyInfo.currency])).every(k => k !== m.moneyInfo.denomination)) {
+                this._repository[m.moneyInfo.currency][m.moneyInfo.denomination] = 0;
+            }
+            this._repository[m.moneyInfo.currency][m.moneyInfo.denomination] += m.count;
+            this._balance[m.moneyInfo.currency] += Number.parseInt(m.moneyInfo.denomination) * this._repository[m.moneyInfo.currency][m.moneyInfo.denomination];
+        });
     }
 }
