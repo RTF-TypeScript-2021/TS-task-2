@@ -32,36 +32,23 @@ export interface IBankUser {
 }
 
 export class BankOffice {
-    private readonly _users: Record<string, IBankUser>;
-    private readonly _cards: Record<string, ICard>;
+    private _users: IBankUser[];
+    private _cards: ICard[];
 
     constructor(users: IBankUser[], cards: ICard[]) {
-        this._users = {};
-        this._cards = {};
-        users.forEach(u => this._users[u.id] = u);
-        cards.forEach(c => this._cards[c.id] = c);
+        this._users = users;
+        this._cards = cards;
     }
 
     public authorize(userId: string, cardId: string, cardPin: string): boolean {
-        return Object
-            .keys(this._users)
-            .some(id => id === userId
-                && this._users[id].cards
-                    .some(c => c.id === cardId && c.pin === cardPin));
+        return this._users.some(u => u.id === userId && u.cards.some(c => c.id === cardId && c.pin === cardPin));
     }
 
     public getCardById(cardId: string): ICard {
-        try {
-            return this._cards[cardId];
-        } catch (e) {
-            throw new Error("нет карты с таким id");
-        }
+        return this._cards.find(c => c.id === cardId);
     }
 
     public isCardTiedToUser(cardId: string): boolean {
-        return Object
-            .keys(this._users)
-            .some(userId => this._users[userId].cards
-                .some(c => c.id === cardId))
+        return this._users.some(u => u.cards.some(c => c.id === cardId));
     }
 }

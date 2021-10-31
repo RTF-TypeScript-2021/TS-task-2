@@ -36,13 +36,18 @@ export class BankTerminal {
     }
 
     public authorizeUser(user: IBankUser, card: ICard, cardPin: string): boolean {
-        return this._bankOffice.authorize(user.id, card.id, cardPin);
+        if (this._bankOffice.authorize(user.id, card.id, cardPin)) {
+            this._userSettingsModule.user = user;
+            this._authorizedUser = user;
+
+            return true;
+        }
+
+        return false;
     }
 
     public takeUsersMoney(moneyUnits: IMoneyUnit[]): boolean {
-        this._moneyRepository.takeMoney(moneyUnits);
-
-        return true
+        return this._moneyRepository.takeMoney(moneyUnits);
     }
 
     public giveOutUsersMoney(count: number): boolean {

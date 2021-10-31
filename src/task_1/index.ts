@@ -69,7 +69,7 @@ export class MoneyRepository {
         return true;
     }
 
-    public takeMoney(moneyUnits: IMoneyUnit[]): void {
+    public takeMoney(moneyUnits: IMoneyUnit[]): boolean {
         moneyUnits.forEach(m => {
             if ((Object.keys(this._repository[m.moneyInfo.currency])).every(k => k !== m.moneyInfo.denomination)) {
                 this._repository[m.moneyInfo.currency][m.moneyInfo.denomination] = 0;
@@ -77,5 +77,7 @@ export class MoneyRepository {
             this._repository[m.moneyInfo.currency][m.moneyInfo.denomination] += m.count;
             this._balance[m.moneyInfo.currency] += Number.parseInt(m.moneyInfo.denomination) * this._repository[m.moneyInfo.currency][m.moneyInfo.denomination];
         });
+
+        return true;
     }
 }
