@@ -16,8 +16,8 @@
 */
 
 import { Currency, UserSettingOptions } from '../enums';
-import { MoneyRepository } from '../task_1';
-import { BankOffice, IBankUser } from '../task_2';
+import { IMoneyUnit, MoneyRepository } from '../task_1';
+import { BankOffice, IBankUser, ICard } from '../task_2';
 import { UserSettingsModule } from '../task_3';
 import { CurrencyConverterModule } from '../task_4';
 
@@ -28,30 +28,38 @@ export class BankTerminal {
 	private _currencyConverterModule: CurrencyConverterModule;
 	private _authorizedUser: IBankUser;
 
-	constructor(initBankOffice: any, initMoneyRepository: any) {
+	constructor(initBankOffice: BankOffice, initMoneyRepository: MoneyRepository) {
 		this._moneyRepository = initMoneyRepository;
 		this._bankOffice = initBankOffice;
 		this._userSettingsModule = new UserSettingsModule(initBankOffice);
 		this._currencyConverterModule = new CurrencyConverterModule(initMoneyRepository);
 	}
 
-	public authorizeUser(user: any, card: any, cardPin: any): any {
-
-	}
-
-	public takeUsersMoney(moneyUnits: any): any {
-
-	}
-
-	public giveOutUsersMoney(count: any): any {
-
-	}
-
-	public changeAuthorizedUserSettings(option: UserSettingOptions, argsForChangeFunction: any): any {
+	public authorizeUser(user: IBankUser, card: ICard, cardPin: string): boolean {
+		this._authorizedUser = user;
+		this._userSettingsModule.user = user;
 		
+		return this._bankOffice.authorize(user.id, card.id, cardPin);
 	}
 
-	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: any): any {
+	public takeUsersMoney(moneyUnits: IMoneyUnit[]): boolean {
+		if (this._authorizedUser === undefined){
+			return false;
+		}
+		this._moneyRepository.takeMoney(moneyUnits);
 
+		return true;
+	}
+
+	public giveOutUsersMoney(count: number, currency: Currency = Currency.RUB): boolean {
+		return this._moneyRepository.giveOutMoney(count, currency);
+	}
+
+	public changeAuthorizedUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
+		return this._userSettingsModule.changeUserSettings(option, argsForChangeFunction);
+	}
+
+	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
+		return this._currencyConverterModule.convertMoneyUnits(fromCurrency, toCurrency, moneyUnits);
 	}
 }
