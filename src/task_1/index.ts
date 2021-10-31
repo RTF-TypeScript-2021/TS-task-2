@@ -18,30 +18,88 @@
  *      пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
  */
 
-import { Currency } from '../enums';
+import { Currency } from "../enums";
 
 interface IMoneyInfo {
-    denomination: string;
-    currency: Currency;
+  denomination: string;
+  currency: Currency;
 }
 
 export interface IMoneyUnit {
-    moneyInfo: IMoneyInfo;
-    count: number;
+  moneyInfo: IMoneyInfo;
+  count: number;
 }
 
+const Denomination = [50, 100, 200, 1000];
+
+type NormalizedMoneyRepository = {
+  [currency in Currency]?: {
+    [denomination: number]: {
+      count: number;
+    };
+    total: number;
+  };
+};
+
 export class MoneyRepository {
-    private _repository: any;
+  private _repository: NormalizedMoneyRepository;
 
-    constructor(initialRepository: any) {
-        this._repository = initialRepository;
-    }
+  constructor(initialRepository: IMoneyUnit[]) {
+      this._repository = this.normalize(initialRepository);
+  }
 
-    public giveOutMoney(count: any, currency: any): any {
+  private normalize = (repository: IMoneyUnit[]) => {
+      const normalize: NormalizedMoneyRepository = {};
+      repository.map((unit) => {
+          if (!normalize[unit.moneyInfo.currency]) {
+              normalize[unit.moneyInfo.currency] = { total: 0 };
+          }
+          normalize[unit.moneyInfo.currency][+unit.moneyInfo.denomination] = {
+              count: unit.count,
+          };
+          normalize[unit.moneyInfo.currency].total += +unit.moneyInfo.denomination * unit.count;
+      });
 
-    }
+      return normalize;
+  };
 
-    public takeMoney(moneyUnits: any): any {
+  public giveOutMoney(count: number, currency: Currency): boolean {
+      if (count > this._repository[currency].total) {
+          return false;
+      }
+      const repositoryCopy = JSON.parse(
+          JSON.stringify(this._repository)
+      ) as NormalizedMoneyRepository;
+      const res = Denomination.reverse().some((denomination) => {
+          const denominationCount = repositoryCopy[currency][denomination].count;
+          if (denominationCount) {
+              const needed = Math.floor(count / denomination);
+              const isEnough = needed > denominationCount ? denominationCount : needed;
+              count -= denomination * isEnough;
+              repositoryCopy[currency][denomination].count -= isEnough;
 
-    }
+              return !count;
+          }
+      });
+      if (res) {
+          repositoryCopy[currency].total -= count;
+          this._repository = repositoryCopy;
+
+          return true;
+      }
+
+      return false;
+  }
+
+  public takeMoney(moneyUnits: IMoneyUnit[]): boolean {
+      moneyUnits.forEach((unit) => {
+          this._repository[unit.moneyInfo.currency][
+              +unit.moneyInfo.denomination
+          ].count = unit.count;
+          this._repository[unit.moneyInfo.currency].total +=
+        unit.count * +unit.moneyInfo.denomination;
+      });
+
+      return true;
+  }
 }

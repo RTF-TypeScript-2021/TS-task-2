@@ -13,42 +13,51 @@
  *			 возвращает true - если карта привязана к какому-нибудь пользователю, false в ином случае
  * 2) Типизировать все свойства и методы класса MoneyRepository,
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
-*/
+ */
 
-import { Currency } from '../enums';
+import { Currency } from "../enums";
 
 export interface ICard {
-	id: string;
-	balance: number;
-	currency: Currency,
-	pin: string,
+  id: string;
+  balance: number;
+  currency: Currency;
+  pin: string;
 }
 
 export interface IBankUser {
-	id: string;
-	name: string;
-	surname: string;
-	cards: Array<ICard>;
+  id: string;
+  name: string;
+  surname: string;
+  cards: Array<ICard>;
 }
 
 export class BankOffice {
-	private _users: any;
-	private _cards: any;
+  private _users: IBankUser[];
+  private _cards: ICard[];
 
-	constructor(users: any, cards: any) {
-		this._users = users;
-		this._cards = cards;
-	}
+  constructor(users: IBankUser[], cards: ICard[]) {
+      this._users = users;
+      this._cards = cards;
+  }
 
-	public authorize(userId: any, cardId: any, cardPin: any): any {
+  public authorize(userId: string, cardId: string, cardPin: string): boolean {
+      const user = this._users.find((user) => user.id === userId);
+      if (!user) {
+          return false;
+      }
 
-	}
+      return !!user.cards.find(
+          (card) => card.id === cardId && card.pin === cardPin
+      );
+  }
 
-	public getCardById(cardId: any): any {
+  public getCardById = (cardId: string): ICard =>
+      this._cards.find((card) => card.id === cardId);
 
-	}
-
-	public isCardTiedToUser(cardId: any): any {
-
-	}
+  public isCardTiedToUser = (cardId: string): boolean =>
+      this._users.some((user) => {
+          if (user.cards.find((card) => card.id === cardId)) {
+              return true;
+          }
+      });
 }
