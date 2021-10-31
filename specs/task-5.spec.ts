@@ -1,7 +1,7 @@
-import { Currency, UserSettingOptions } from '../src/enums';
-import { MoneyRepository } from '../src/task_1/index';
-import { BankOffice, IBankUser, ICard } from '../src/task_2/index';
-import { BankTerminal } from '../src/task_5/index';
+import {Currency, UserSettingOptions} from '../src/enums';
+import {MoneyRepository} from '../src/task_1/index';
+import {BankOffice, IBankUser, ICard} from '../src/task_2/index';
+import {BankTerminal} from '../src/task_5/index';
 
 const user: IBankUser[] = [
     {
@@ -48,10 +48,10 @@ const cards: ICard[] = [
 ];
 
 const rep: MoneyRepository = new MoneyRepository([
-    { moneyInfo: { denomination: "50", currency: Currency.RUB }, count: 1 },
-    { moneyInfo: { denomination: "200", currency: Currency.RUB }, count: 1 },
-    { moneyInfo: { denomination: "1000", currency: Currency.RUB }, count: 1 },
-    { moneyInfo: { denomination: "100", currency: Currency.RUB }, count: 1 },
+    {moneyInfo: {denomination: "50", currency: Currency.RUB}, count: 1},
+    {moneyInfo: {denomination: "200", currency: Currency.RUB}, count: 1},
+    {moneyInfo: {denomination: "1000", currency: Currency.RUB}, count: 1},
+    {moneyInfo: {denomination: "100", currency: Currency.RUB}, count: 1},
 ]);
 
 const bank: BankOffice = new BankOffice(user, cards)
@@ -65,7 +65,7 @@ test('authorize method works correct', () => {
 test('takeUsersMoney method works correct', () => {
     bankTerminal.authorizeUser(user[0], user[0].cards[0], "0000");
     expect(bankTerminal.takeUsersMoney([{
-        moneyInfo: { denomination: "50", currency: Currency.RUB },
+        moneyInfo: {denomination: "50", currency: Currency.RUB},
         count: 1
     }])).toBe(true);
 });

@@ -33,7 +33,7 @@ export class UserSettingsModule {
     }
 
     private changeUserName(newName: string): boolean {
-        if (this._user !== undefined && this._user.name !== newName) {
+        if (this._user && this._user.name !== newName) {
             this._user.name = newName;
 
             return true;
@@ -43,7 +43,7 @@ export class UserSettingsModule {
     }
 
     private changeUserSurname(newSurname: string): boolean {
-        if (this._user !== undefined && this._user.surname !== newSurname) {
+        if (this._user && this._user.surname !== newSurname) {
             this._user.surname = newSurname;
 
             return true;
@@ -53,7 +53,7 @@ export class UserSettingsModule {
     }
 
     private registerForUserNewCard(newCardId: string): boolean {
-        return this._user !== undefined && this._bankOffice.getCardById(newCardId) !== undefined;
+        return this._user && this._bankOffice.getCardById(newCardId) !== undefined;
     }
 
     public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
