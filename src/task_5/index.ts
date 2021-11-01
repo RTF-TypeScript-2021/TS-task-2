@@ -97,6 +97,8 @@ export class BankTerminal {
 	}
 
 	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnit: IMoneyUnit): number {
+		//Не поняв, а нужно принять одну валюту и вернуть другию тип. После чего обновить данные в
+		// текущем терминале
 		if (this._authorizedUser) {
 			return this._currencyConverterModule.convertMoneyUnits(fromCurrency, toCurrency, moneyUnit);
 		} else {
