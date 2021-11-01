@@ -33,7 +33,7 @@ export class UserSettingsModule {
     }
 
     private changeUserName(newName: string): boolean {
-        if (this._user.name === newName) {
+        if (!this._user || this._user.name === newName) {
             return false;
         }
         this._user.name = newName;
@@ -42,7 +42,7 @@ export class UserSettingsModule {
     }
 
     private changeUserSurname(newSurname: string): boolean {
-        if (this._user.surname === newSurname) {
+        if (!this._user || this._user.surname === newSurname) {
             return false;
         }
         this._user.surname = newSurname;
