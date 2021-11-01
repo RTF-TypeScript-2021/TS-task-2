@@ -81,7 +81,7 @@ test('changeAuthorizedUserSettings method works correct', () => {
     expect(bankTerminal.changeAuthorizedUserSettings(UserSettingOptions.name, "Olga")).toBe(true);
 });
 
-test('changeAuthorizedUserSettings method works correct', () => {
+test('changeNotAuthorizedUserSettings method works correct', () => {
     const bankTerminalNotAuth = new BankTerminal(bank, rep);
     expect(bankTerminalNotAuth.changeAuthorizedUserSettings(UserSettingOptions.name, "Valentina")).toBe(false);
 });

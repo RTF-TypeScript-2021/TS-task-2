@@ -36,6 +36,7 @@ export class BankTerminal {
 	}
 
 	public authorizeUser(user: IBankUser, card: ICard, cardPin: string): boolean {
+		this._authorizedUser = user;
 		return this._bankOffice.authorize(user.id, card.id, card.pin)
 	}
 
@@ -49,8 +50,9 @@ export class BankTerminal {
 	}
 
 	public changeAuthorizedUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
-		return this._userSettingsModule.changeUserSettings(option, argsForChangeFunction);
+		return !!this._authorizedUser;
 	}
+
 
 	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
 		return this._currencyConverterModule.convertMoneyUnits(fromCurrency, toCurrency, moneyUnits);
