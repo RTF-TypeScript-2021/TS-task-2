@@ -31,17 +31,75 @@ export interface IMoneyUnit {
 }
 
 export class MoneyRepository {
-    private _repository: any;
+    private _repository: IMoneyUnit[];
 
-    constructor(initialRepository: any) {
-        this._repository = initialRepository;
+    constructor(initialRepository: IMoneyUnit[]) {
+        this._repository = [];
+        this.takeMoney(initialRepository);
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(count: number, currency: Currency): boolean {
+        let maxInfo: [number, number];
+        let currentCheck = 0;
+        const toGive = count;
+        let forSearch: Array<IMoneyUnit> = this._repository.filter(unit => unit.moneyInfo.currency === currency && unit.count > 0 && parseInt(unit.moneyInfo.denomination) <= count);
+        const given: Array<[number, number]> = [];
+        while(forSearch.length > 0) {
+            if (count <= 0) {
+                break;
+            }
+            maxInfo = this.findMax(forSearch);
+            
+            if (Math.floor(count / maxInfo[0]) < maxInfo[1]) {
+                currentCheck += Math.floor(count / maxInfo[0])*maxInfo[0];
+                count -= Math.floor(count / maxInfo[0])*maxInfo[0];
+                given.push([maxInfo[0], count / maxInfo[0]])
+            } else {
+                currentCheck += maxInfo[1]*maxInfo[0];
+                count -= maxInfo[1]*maxInfo[0];
+                given.push([maxInfo[0], maxInfo[1]])
+            }
+            if (currentCheck === toGive) {
+                this._repository.map(unit => {
+                    given.forEach(element => {
+                        if (element[0] === parseInt(unit.moneyInfo.denomination)) {
+                            unit.count -= element[1];
+                        }
+                    })
+                })
 
+                return true;
+            } 
+            forSearch = forSearch.filter(unit => parseInt(unit.moneyInfo.denomination) !== maxInfo[0]);      
+        }
+
+        return false;
     }
 
-    public takeMoney(moneyUnits: any): any {
+    private findMax(array: IMoneyUnit[]): [number, number] {
+        const maxInfo: [number, number] = [0, 0];
+        array.forEach(element => {
+            if (parseInt(element.moneyInfo.denomination) > maxInfo[0]) {
+                maxInfo[0] = parseInt(element.moneyInfo.denomination);
+                maxInfo[1] = element.count;
+            }
+        });
 
+        return maxInfo;
+    }
+
+    public takeMoney(moneyUnits: IMoneyUnit[]): void {       
+        moneyUnits.forEach(element => {
+            let alreadyHave = false;
+            this._repository.forEach(element2 => {
+                if (element2.moneyInfo.currency === element.moneyInfo.currency && element2.moneyInfo.denomination === element.moneyInfo.denomination) {
+                    element2.count += element.count;
+                    alreadyHave = true;
+                } 
+            });
+            if(!alreadyHave) {
+                this._repository.push({moneyInfo: element.moneyInfo, count: element.count});
+            }                
+        });
     }
 }

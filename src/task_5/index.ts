@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 /** Задача 5 - BankTerminal
  * Имеется класс BankTerminal. Класс представляет банковский терминал.
  * Требуется:
@@ -16,8 +17,8 @@
 */
 
 import { Currency, UserSettingOptions } from '../enums';
-import { MoneyRepository } from '../task_1';
-import { BankOffice, IBankUser } from '../task_2';
+import { IMoneyUnit, MoneyRepository } from '../task_1';
+import { BankOffice, IBankUser, ICard } from '../task_2';
 import { UserSettingsModule } from '../task_3';
 import { CurrencyConverterModule } from '../task_4';
 
@@ -27,31 +28,62 @@ export class BankTerminal {
 	private _userSettingsModule: UserSettingsModule;
 	private _currencyConverterModule: CurrencyConverterModule;
 	private _authorizedUser: IBankUser;
+    private _authorizedCard: ICard;
 
-	constructor(initBankOffice: any, initMoneyRepository: any) {
-		this._moneyRepository = initMoneyRepository;
-		this._bankOffice = initBankOffice;
-		this._userSettingsModule = new UserSettingsModule(initBankOffice);
-		this._currencyConverterModule = new CurrencyConverterModule(initMoneyRepository);
+	constructor(initBankOffice: BankOffice, initMoneyRepository: MoneyRepository) {
+        this._moneyRepository = initMoneyRepository;
+        this._bankOffice = initBankOffice;
+        this._userSettingsModule = new UserSettingsModule(initBankOffice);
+        this._currencyConverterModule = new CurrencyConverterModule(initMoneyRepository);
 	}
 
-	public authorizeUser(user: any, card: any, cardPin: any): any {
+	public authorizeUser(user: IBankUser, card: ICard, cardPin: string): boolean {
+        if (this._bankOffice.authorize(user.id, card.id, cardPin)) {
+            this._authorizedUser = user;
+            this._authorizedCard = card;
+            this._userSettingsModule.user = this._authorizedUser;
 
+            return true;
+        }
+        
+        return false;
 	}
 
-	public takeUsersMoney(moneyUnits: any): any {
-
+	public takeUsersMoney(moneyUnits: IMoneyUnit[]): boolean {
+        if (!this.checkMoney(moneyUnits)) {
+            return false;
+        }
+        moneyUnits.forEach(unit => {
+            this._authorizedCard.balance += unit.count*parseInt(unit.moneyInfo.denomination);
+        })
+        this._moneyRepository.takeMoney(moneyUnits);
+        
+        return true;
 	}
 
-	public giveOutUsersMoney(count: any): any {
+    private checkMoney(moneyUnits: IMoneyUnit[]): boolean {
+        for(const unit of moneyUnits) {
+            if (unit.moneyInfo.currency !== this._authorizedCard.currency) {
+                return false;
+            }
+        }
 
+        return true;
+    }
+
+	public giveOutUsersMoney(count: number): boolean {
+        if (this._authorizedCard.balance >= count) {
+            return this._moneyRepository.giveOutMoney(count, this._authorizedCard.currency);
+        }
+
+        return false;
 	}
 
-	public changeAuthorizedUserSettings(option: UserSettingOptions, argsForChangeFunction: any): any {
-		
+	public changeAuthorizedUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
+		return this._userSettingsModule.changeUserSettings(option, argsForChangeFunction);
 	}
 
-	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: any): any {
-
+	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
+        return this._currencyConverterModule.convertMoneyUnits(fromCurrency, toCurrency, moneyUnits);
 	}
 }

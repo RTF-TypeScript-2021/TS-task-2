@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 /** Задача 1 - BankOffice
  * Имеется класс BankOffice. Который должен хранить пользователей и банковские карты.
  * Пользователи банка могу иметь карту, а могут не иметь.
@@ -32,23 +33,57 @@ export interface IBankUser {
 }
 
 export class BankOffice {
-	private _users: any;
-	private _cards: any;
+	private _users: IBankUser[];
+	private _cards: ICard[];
 
-	constructor(users: any, cards: any) {
-		this._users = users;
-		this._cards = cards;
+	constructor(users: IBankUser[], cards: ICard[]) {
+        this._users = users;
+        this._cards = cards;
 	}
 
-	public authorize(userId: any, cardId: any, cardPin: any): any {
+	public authorize(userId: string, cardId: string, cardPin: string): boolean {
+        const user = this.getUserById(userId);        
+        const card = this.getCardById(cardId);
+        if (user === undefined || card === undefined || card.pin !== cardPin) {
+            return false;
+        }
+        if (user.cards.includes(card)) {
+            return true;
+        }
 
+        return false;
 	}
 
-	public getCardById(cardId: any): any {
+    private getUserById(userId: string) : IBankUser {
+        return this._users.find(user => user.id === userId);
+    }
 
+    public getCardById(cardId: string): ICard {
+        for (const card of this._cards) {
+            if (card.id === cardId) {
+                return card;
+            }
+        }
+        for (const user of this._users) {
+            for (const card of user.cards) {
+                if (card.id === cardId) {
+                    return card;
+                }
+            }
+        }
+
+        return undefined;
 	}
 
-	public isCardTiedToUser(cardId: any): any {
+	public isCardTiedToUser(cardId: string): boolean {
+        for (const user of this._users) {
+            for (const card of user.cards) {
+                if (card.id === cardId) {
+                    return true;
+                }
+            }
+        }
 
+        return false;
 	}
 }

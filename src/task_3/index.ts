@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 /** Задача 3 - UserSettingsModule
  * Имеется класс UserSettingsModule. Который должен отвечать за
  * изменение настроек пользователя.
@@ -18,32 +19,67 @@
 */
 
 import { UserSettingOptions } from '../enums';
+import { BankOffice, IBankUser } from '../task_2';
 
 export class UserSettingsModule {
-	private _bankOffice: any;
-	private _user: any;
+	private _bankOffice: BankOffice;
+	private _user: IBankUser;
 
-	public set user(user: any) {
-		this._user = user;
+	public set user(user: IBankUser) {
+        this._user = user;
 	}
 
-	constructor(initialBankOffice: any) {
-		this._bankOffice = initialBankOffice;
+	constructor(initialBankOffice: BankOffice) {
+        this._bankOffice = initialBankOffice;
 	}
 
-	private changeUserName(newName: any): any {
+	private changeUserName(newName: string): boolean {
+        if (this._user !== null && this._user !== undefined) {
+            if (this._user.name !== newName) {
+                this._user.name = newName;
 
+                return true;
+            }
+        }
+
+        return false;
 	}
 
-	private changeUserSurname(newSurname: any): any {
+	private changeUserSurname(newSurname: string): boolean {
+        if (this._user !== null && this._user !== undefined) {
+            if (this._user.surname !== newSurname) {
+                this._user.surname = newSurname;
 
+                return true;
+            }
+        }
+
+        return false;
 	}
 
-	private registerForUserNewCard(newCardId: any): any {
+	private registerForUserNewCard(newCardId: string): boolean {
+        const card = this._bankOffice.getCardById(newCardId);
+        if (this._user !== null && this._user !== undefined && card !== undefined) {       
+            if(!this._bankOffice.isCardTiedToUser(card.id)) {
+                this._user.cards.push(card);
 
+                return true;
+            }
+        }
+
+        return false;
 	}
 
-	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: any): any {
-
+	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
+        switch(option) {
+            case 0: 
+                return this.changeUserName(argsForChangeFunction);
+            case 1:
+                return this.changeUserSurname(argsForChangeFunction);
+            case 2: 
+                return this.registerForUserNewCard(argsForChangeFunction);
+            default:
+                return false;           
+        }
 	}
 }
