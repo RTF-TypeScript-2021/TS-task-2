@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 /** Задача 4 - CurrencyConverterModule
  * Имеется класс CurrencyConverterModule. Который должен отвечать за
  * конвертацию валют.
@@ -16,15 +17,24 @@
 */
 
 import { Currency } from '../enums';
+import { IMoneyUnit, MoneyRepository } from '../task_1';
 
 export class CurrencyConverterModule {
-	private _moneyRepository: any;
+	private _moneyRepository: MoneyRepository;
 
-	constructor(initialMoneyRepository: any) {
+	constructor(initialMoneyRepository: MoneyRepository) {
 		this._moneyRepository = initialMoneyRepository;
 	}
 
-	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: any): any {
+	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
+        const moneysum = moneyUnits.count * Number(moneyUnits.moneyInfo.denomination)
+        if (fromCurrency === Currency.RUB && toCurrency === Currency.USD && moneysum % 70 === 0) {
+                return moneysum / 70;
+        } 
+        if (fromCurrency === Currency.USD && toCurrency === Currency.RUB) {
+                return moneysum * 70;
+        }
 
+        return 0;
 	}
 }

@@ -1,3 +1,5 @@
+/* eslint-disable indent */
+/* eslint-disable no-mixed-spaces-and-tabs */
 /** Задача 3 - UserSettingsModule
  * Имеется класс UserSettingsModule. Который должен отвечать за
  * изменение настроек пользователя.
@@ -18,32 +20,63 @@
 */
 
 import { UserSettingOptions } from '../enums';
+import { BankOffice, IBankUser } from '../task_2';
 
 export class UserSettingsModule {
-	private _bankOffice: any;
-	private _user: any;
+	private _bankOffice: BankOffice;
+	private _user: IBankUser;
 
-	public set user(user: any) {
-		this._user = user;
+	public set user(user: IBankUser) {
+	    this._user = user;
 	}
 
-	constructor(initialBankOffice: any) {
+    public get user() {
+        return this._user;
+    }
+
+	constructor(initialBankOffice: BankOffice) {
 		this._bankOffice = initialBankOffice;
 	}
 
-	private changeUserName(newName: any): any {
+	private changeUserName(newName: string): boolean {
+        if (this.user && this.user.name !== newName) {
+            this.user.name = newName;
 
+            return true;
+        }
+        
+        return false;
 	}
 
-	private changeUserSurname(newSurname: any): any {
-
+	private changeUserSurname(newSurname: string): boolean {
+        if (this.user.surname === newSurname) {
+            return false;
+        }
+        this._user.surname = newSurname;
+        
+        return true;
 	}
 
-	private registerForUserNewCard(newCardId: any): any {
-
+	private registerForUserNewCard(newCardId: string): boolean {
+        const isCardTiedToUser: boolean = this._bankOffice.isCardTiedToUser(newCardId);
+        if (isCardTiedToUser){
+            return false;
+        }
+        const isBankHavingCard: object = this._bankOffice.getCardById(newCardId);
+        if (isBankHavingCard === undefined) {
+            return false;
+        }
+        
+        return true;
 	}
 
-	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: any): any {
-
+	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
+        if (option === UserSettingOptions.name) {
+            return this.changeUserName(argsForChangeFunction);
+        } else if (option === UserSettingOptions.surname){
+            return this.changeUserSurname(argsForChangeFunction);
+        } else {
+            return this.registerForUserNewCard(argsForChangeFunction);
+        }
 	}
 }
