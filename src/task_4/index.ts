@@ -28,15 +28,13 @@ export class CurrencyConverterModule {
 	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): Number {
 		const moneySum = moneyUnits.count * Number(moneyUnits.moneyInfo.denomination);
 		if (fromCurrency === Currency.RUB && toCurrency === Currency.USD && moneySum % 70 === 0) {
-			if (this._moneyRepository.giveOutMoney(moneySum / 70, Currency.USD))
-			{
+		
 				return moneySum / 70;
-			};
 		} else if (fromCurrency === Currency.USD && toCurrency === Currency.RUB) {
-			if(this._moneyRepository.giveOutMoney(moneySum * 70, Currency.RUB)){
+
 				return moneySum * 70;
-			}
 		} else{
+
 			return 0;
 		}
 	}

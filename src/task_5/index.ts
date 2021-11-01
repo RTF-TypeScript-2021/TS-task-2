@@ -40,6 +40,7 @@ export class BankTerminal {
 		if(this._bankOffice.authorize(user.id, card.id, cardPin)){
 			this._authorizedUser = user;
 			this._authorizedUserCard = card;
+			this._userSettingsModule.user = user;
 
 			return true;
 		} else {
