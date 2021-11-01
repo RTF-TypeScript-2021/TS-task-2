@@ -37,6 +37,7 @@ export class BankTerminal {
 
     public authorizeUser(user: IBankUser, card: ICard, cardPin: string): boolean {
         if (this._bankOffice.authorize(user.id, card.id, cardPin)) {
+            this._userSettingsModule.user = user;
             this._authorizedUser = user;
 
             return true;
