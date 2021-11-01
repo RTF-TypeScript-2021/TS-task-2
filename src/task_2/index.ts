@@ -49,9 +49,10 @@ export class BankOffice {
 
 	public getCardById(cardId: string): ICard {
 		let notLinkedCard = this._cards.find(card => card.id === cardId);
-		if (notLinkedCard === undefined)
-			return this._users.find(user => user.cards.find(card => card.id === cardId))
-			.cards.find(card => card.id === cardId);
+		if (notLinkedCard === undefined) {
+			const userWithCard = this._users.find(user => user.cards.find(card => card.id === cardId));
+			return userWithCard === undefined ? undefined : userWithCard.cards.find(card => card.id === cardId);
+		}
 		return notLinkedCard;
 	}
 
