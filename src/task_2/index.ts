@@ -1,4 +1,7 @@
-/** Задача 1 - BankOffice
+/* eslint-disable no-mixed-spaces-and-tabs */
+// eslint-disable-next-line no-mixed-spaces-and-tabs
+/** // eslint-disable-next-line no-mixed-spaces-and-tabs
+ * Задача 1 - BankOffice
  * Имеется класс BankOffice. Который должен хранить пользователей и банковские карты.
  * Пользователи банка могу иметь карту, а могут не иметь.
  * Карты могут иметь своего владельца, а могут не иметь.
@@ -32,23 +35,55 @@ export interface IBankUser {
 }
 
 export class BankOffice {
-	private _users: any;
-	private _cards: any;
+	private _users: Array<IBankUser>;
+	private _cards: Array<ICard>;
 
-	constructor(users: any, cards: any) {
-		this._users = users;
-		this._cards = cards;
+	constructor(users: Array<IBankUser>, cards: Array<ICard>) {
+	    this._users = users;
+	    this._cards = cards;
 	}
 
-	public authorize(userId: any, cardId: any, cardPin: any): any {
+	public authorize(userId: string, cardId: string, cardPin: string): boolean {
+	    for(const user of this._users){
+	        if(user.id === userId){
+	            for (const card of user.cards) {
+	                if (card.id === cardId && card.pin === cardPin){
+	                    return true;
+	                }
+	            }
+	        }
+	    }
 
+	    return false;
 	}
 
-	public getCardById(cardId: any): any {
-
+	public getCardById(cardId: string): object {
+	    if(this.checkTiedToUser(cardId) !== undefined){
+	    	return this.checkTiedToUser(cardId);
+	    }
+	    for(const card of this._cards){
+	        if(card.id === cardId){
+	            return card;
+	        }
+	    }
+	}
+	
+	
+	public isCardTiedToUser(cardId: string): boolean {
+	    if(this.checkTiedToUser(cardId) !== undefined){
+	        return true; 
+	    } else{
+	        return false;
+	        }
 	}
 
-	public isCardTiedToUser(cardId: any): any {
-
+	public checkTiedToUser(cardId: string): object {
+	    for(const bankUser of this._users){
+	        for(const card of bankUser.cards) {
+	            if(card.id === cardId){
+	            	return card;
+	            }
+	        }
+	    }
 	}
 }

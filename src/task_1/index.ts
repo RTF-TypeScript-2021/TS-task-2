@@ -21,7 +21,7 @@
 import { Currency } from '../enums';
 
 interface IMoneyInfo {
-    denomination: string;
+    denomination: string | number;
     currency: Currency;
 }
 
@@ -31,17 +31,47 @@ export interface IMoneyUnit {
 }
 
 export class MoneyRepository {
-    private _repository: any;
+    private _repository: Array<IMoneyUnit>;
 
-    constructor(initialRepository: any) {
+    constructor(initialRepository: Array<IMoneyUnit>) {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(count: number, currency: Currency): boolean {
+        if(this._repository.length === 0) {
+            return false;
+        }
 
+        let denominationAll = this._repository.filter(unit => unit.moneyInfo.currency === currency).sort(function(unit, anotherUnit) {
+            const a = Number(unit.moneyInfo.denomination);
+            const b = Number(anotherUnit.moneyInfo.denomination);
+
+            return b > a ? 1 : b < a ? -1 : 0;
+        });
+
+        denominationAll.forEach(moneyUnit => {
+            const denominationNumber = Number(moneyUnit.moneyInfo.denomination);
+            const checkAvailable = Math.floor(count/denominationNumber);
+            if(checkAvailable <= moneyUnit.count){
+                count -= denominationNumber * checkAvailable;
+                moneyUnit.count -= checkAvailable;
+            } else {
+                count -= denominationNumber * moneyUnit.count;
+                moneyUnit.count -= moneyUnit.count;
+            }
+
+        })
+        
+        if (count === 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public takeMoney(moneyUnits: any): any {
-
+    public takeMoney(moneyUnits: Array<IMoneyUnit>): void {
+        for(const unit of moneyUnits){
+            this._repository.push(unit);
+        }
     }
 }

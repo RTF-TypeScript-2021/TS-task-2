@@ -18,32 +18,55 @@
 */
 
 import { UserSettingOptions } from '../enums';
+import { BankOffice, IBankUser} from '../task_2';
 
 export class UserSettingsModule {
-	private _bankOffice: any;
-	private _user: any;
+	private _bankOffice: BankOffice;
+	private _user: IBankUser;
 
-	public set user(user: any) {
+	public set user(user: IBankUser) {
 		this._user = user;
 	}
 
-	constructor(initialBankOffice: any) {
+	constructor(initialBankOffice: BankOffice) {
 		this._bankOffice = initialBankOffice;
 	}
 
-	private changeUserName(newName: any): any {
-
+	private changeUserName(newName: string): boolean {
+		if (this._user.name === newName){
+			return false;
+		} else if(this._user.name = newName){
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	private changeUserSurname(newSurname: any): any {
-
+	private changeUserSurname(newSurname: string): boolean {
+		if (this._user.surname === newSurname){
+			return false;
+		} else{
+			this._user.surname = newSurname;
+			return true;
+		}
 	}
 
-	private registerForUserNewCard(newCardId: any): any {
-
+	private registerForUserNewCard(newCardId: string): boolean {
+		const BankHaveCard = this._bankOffice.getCardById(newCardId);
+		if (BankHaveCard === undefined || this._bankOffice.isCardTiedToUser(newCardId)) {
+			return false;
+		}
+	
+		return true;
 	}
 
-	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: any): any {
-
+	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
+		if (option === UserSettingOptions.name)	{
+			return this.changeUserName(argsForChangeFunction);
+		} else if (option === UserSettingOptions.surname) {
+			return this.changeUserSurname(argsForChangeFunction);
+		} else {
+			return this.registerForUserNewCard(argsForChangeFunction);
+		}
 	}
 }
