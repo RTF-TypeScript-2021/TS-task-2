@@ -11,7 +11,7 @@
  * 			 Карта считается успешно привязанной, если она существует и она не привязана ни к одному пользователю
  * 			 возвращает true, если операция удалась и false в ином случае
  * 		1.4) changeUserSettings - управляющий метод
- * 			 который возвращает резльтат работы одного из методов из 1.1 - 1.3
+ * 			 который возвращает результат работы одного из методов из 1.1 - 1.3
  * 			 на основе переданных аргументов
  * 2) Типизировать все свойства и методы класса UserSettingsModule,
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
@@ -33,20 +33,22 @@ export class UserSettingsModule {
 	}
 
 	private changeUserName(newName: string): boolean {
-		let oldName: string = this._user.name;
-		if (this._user.name !== newName) {
-			this._user.name = newName;
+		let oldName: string = this._user?.name;
+		if (!this._user || this._user.name === newName) {
+			return false;
 		}
 
+		this._user.name = newName;
 		return oldName !== newName;
 	}
 
 	private changeUserSurname(newSurname: string): boolean {
-		let oldSurname: string = this._user.surname;
-		if (this._user.surname !== newSurname) {
-			this._user.surname = newSurname;
+		let oldSurname: string = this._user?.surname;
+		if (!this._user || this._user.surname === newSurname) {
+			return false;
 		}
 
+		this._user.surname = newSurname;
 		return oldSurname !== newSurname;
 	}
 

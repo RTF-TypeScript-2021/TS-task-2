@@ -32,9 +32,10 @@ export class CurrencyConverterModule {
 		}
 
 		if (toCurrency === Currency.RUB) {
-			result = moneyUnits.count * Number(moneyUnits?.moneyInfo.denomination) * 70;
-		} else {
-			result = moneyUnits.count * Number(moneyUnits?.moneyInfo.denomination) / 70;
+			result = moneyUnits.count * Number(moneyUnits.moneyInfo.denomination) * 70;
+		}
+		if (toCurrency === Currency.USD && moneyUnits.count * Number(moneyUnits.moneyInfo.denomination) % 70 === 0) {
+			result = moneyUnits.count * Number(moneyUnits.moneyInfo.denomination) / 70;
 		}
 
 		return result;

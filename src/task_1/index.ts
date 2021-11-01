@@ -18,7 +18,7 @@
  *      пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
  */
 
-import { Currency } from '../enums';
+import {Currency} from '../enums';
 
 interface IMoneyInfo {
     denomination: string;
@@ -31,18 +31,20 @@ export interface IMoneyUnit {
 }
 
 export class MoneyRepository {
-    private _repository: IMoneyUnit[];
+    private readonly _repository: IMoneyUnit[];
 
     constructor(initialRepository: IMoneyUnit[]) {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: number, currency: Currency): boolean {
+    public giveOutMoney(count: number, currency: Currency = Currency.RUB): boolean {
         this._repository.sort((prev, next) => {
-            if (Number(prev.moneyInfo.denomination) < Number(next.moneyInfo.denomination))
+            if (Number(prev.moneyInfo.denomination) < Number(next.moneyInfo.denomination)) {
                 return -1;
-            if (Number(prev.moneyInfo.denomination) < Number(next.moneyInfo.denomination))
+            }
+            if (Number(prev.moneyInfo.denomination) < Number(next.moneyInfo.denomination)) {
                 return 1;
+            }
         }).reverse();
 
         let sum: number = this.sumMoney(currency);
@@ -51,12 +53,12 @@ export class MoneyRepository {
         }
 
         sum = 0;
-
         for (let i = 0; i < this._repository.length; i++) {
             for (let curCount = this._repository[i]?.count; curCount > 0; curCount--) {
-                const denomination: number = Number(this._repository[i].moneyInfo.denomination);
-                if (denomination * curCount > count || currency !== this._repository[i].moneyInfo.currency)
+                const denomination: number = Number(this._repository[i]?.moneyInfo.denomination);
+                if (denomination * curCount > count || currency !== this._repository[i]?.moneyInfo.currency) {
                     continue;
+                }
 
                 sum += denomination * curCount;
                 if (this._repository[i].count === curCount) {
@@ -64,30 +66,42 @@ export class MoneyRepository {
                 } else {
                     this._repository[i].count--;
                 }
+
+                if (sum === count) {
+                    break;
+                }
+            }
+
+            if (sum === count) {
+                break;
             }
         }
 
         return sum === count;
     }
 
-    public takeMoney(moneyUnits: IMoneyUnit[]) {
+    public takeMoney(moneyUnits: IMoneyUnit[]): boolean {
         for (let i = 0; i < moneyUnits.length; i++) {
             let curMoneyUnit: IMoneyUnit = this._repository.find(moneyUnit =>
                 moneyUnit?.moneyInfo.denomination === moneyUnits[i].moneyInfo.denomination
             && moneyUnit?.moneyInfo.currency === moneyUnits[i].moneyInfo.currency)
-            if (curMoneyUnit !== undefined)
+            if (curMoneyUnit !== undefined) {
                 curMoneyUnit.count += moneyUnits[i].count;
-            else
+            } else {
                 this._repository.push(moneyUnits[i]);
+            }
         }
+
+        return true;
     }
 
-    public sumMoney(currency: Currency, curCount = 0) { //this method is public because i use it in task4
+    public sumMoney(currency: Currency) { //this method is public because i use it in task4
         let sum: number = 0;
         for (let i = 0; i < this._repository.length; i++) {
-            if (this._repository[i]?.moneyInfo.currency !== currency)
+            if (this._repository[i]?.moneyInfo.currency !== currency) {
                 continue;
-            sum += Number(this._repository[i]?.moneyInfo.denomination) * this._repository[i]?.count - curCount;
+            }
+            sum += Number(this._repository[i]?.moneyInfo.denomination) * this._repository[i]?.count;
         }
 
         return sum;
