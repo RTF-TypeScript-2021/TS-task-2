@@ -41,16 +41,16 @@ export class BankOffice {
 	}
 
 	public authorize(userId: string, cardId: string, cardPin: string): boolean {
-		let user = this._users.find(user => user.id === userId);
-		let card = user.cards.find(card => card.id === cardId);
+		let user: IBankUser = this._users.find(user => user.id === userId);
+		let card: ICard = user.cards.find(card => card.id === cardId);
 
 		return user.cards.indexOf(card) !== -1 && card.pin === cardPin;
 	}
 
 	public getCardById(cardId: string): ICard {
-		let notLinkedCard = this._cards.find(card => card.id === cardId);
+		let notLinkedCard: ICard = this._cards.find(card => card.id === cardId);
 		if (notLinkedCard === undefined) {
-			const userWithCard = this._users.find(user => user.cards.find(card => card.id === cardId));
+			const userWithCard: IBankUser = this._users.find(user => user.cards.find(card => card.id === cardId));
 			return userWithCard === undefined ? undefined : userWithCard.cards.find(card => card.id === cardId);
 		}
 		return notLinkedCard;
