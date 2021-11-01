@@ -18,30 +18,61 @@
  *      пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
  */
 
-import { Currency } from '../enums';
+ import { Currency } from '../enums';
 
-interface IMoneyInfo {
-    denomination: string;
-    currency: Currency;
-}
-
-export interface IMoneyUnit {
-    moneyInfo: IMoneyInfo;
-    count: number;
-}
-
-export class MoneyRepository {
-    private _repository: any;
-
-    constructor(initialRepository: any) {
-        this._repository = initialRepository;
-    }
-
-    public giveOutMoney(count: any, currency: any): any {
-
-    }
-
-    public takeMoney(moneyUnits: any): any {
-
-    }
-}
+ interface IMoneyInfo {
+     denomination: string;
+     currency: Currency;
+ }
+ 
+ export interface IMoneyUnit {
+     moneyInfo: IMoneyInfo;
+     count: number;
+ }
+ 
+ export class MoneyRepository {
+     private _repository: IMoneyUnit[];
+ 
+     constructor(initialRepository: IMoneyUnit[]) {
+         this._repository = initialRepository;
+     }
+ 
+     public giveOutMoney(count: number, currency: Currency): boolean {
+         this._repository.sort((a,b) => parseInt(b.moneyInfo.denomination) - parseInt(a.moneyInfo.denomination))
+         for(let obj of this._repository){
+             const denomination = parseInt(obj.moneyInfo.denomination);
+             if(obj.moneyInfo.currency !== currency || denomination > count || obj.count === 0){
+                 continue;
+             }else{
+                 const ost = count/denomination;
+                 if (ost > obj.count){
+                     count = count - obj.count*denomination;
+                     obj.count = 0
+                 }else{
+                     count = count - ost*denomination;
+                     obj.count -= ost
+                 }
+             }
+         }
+ 
+         return count === 0;
+     }
+ 
+     public takeMoney(moneyUnits: IMoneyUnit[]): boolean {
+         for (let j = 0; j< moneyUnits.length; j++){
+             let canTake = false
+             for (let i = 0; i < this._repository.length; i++) {
+                 if (this._repository[i].moneyInfo.denomination === moneyUnits[j].moneyInfo.denomination
+                    && this._repository[i].moneyInfo.currency === moneyUnits[j].moneyInfo.currency) {
+                     this._repository[i].count += moneyUnits[j].count
+                     canTake = true
+                 }
+             }
+             if (!canTake){
+                 this._repository.push({ moneyInfo: { denomination: moneyUnits[j].moneyInfo.denomination, currency: moneyUnits[j].moneyInfo.currency }, count: moneyUnits[j].count })
+             }
+         }
+ 
+         return true
+     }
+ }
