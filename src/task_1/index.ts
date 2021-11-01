@@ -31,17 +31,65 @@ export interface IMoneyUnit {
 }
 
 export class MoneyRepository {
-    private _repository: any;
+    private _repository: IMoneyUnit[];
 
-    constructor(initialRepository: any) {
+    constructor(initialRepository: IMoneyUnit[]) {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(count: number, currency: Currency): boolean {
+        this._repository.sort((prev, next) => {
+            if (Number(prev.moneyInfo.denomination) < Number(next.moneyInfo.denomination))
+                return -1;
+            if (Number(prev.moneyInfo.denomination) < Number(next.moneyInfo.denomination))
+                return 1;
+        }).reverse();
 
+        let sum = this.sumMoney(currency);
+        if (sum < count) {
+            return false;
+        }
+
+        sum = 0;
+
+        for (let i = 0; i < this._repository.length; i++) {
+            for (let curCount = this._repository[i]?.count; curCount > 0; curCount--) {
+                const denomination = Number(this._repository[i].moneyInfo.denomination);
+                if (denomination * curCount > count || currency !== this._repository[i].moneyInfo.currency)
+                    continue;
+
+                sum += denomination * curCount;
+                if (this._repository[i].count === curCount) {
+                    delete this._repository[i];
+                } else {
+                    this._repository[i].count--;
+                }
+            }
+        }
+
+        return sum === count;
     }
 
-    public takeMoney(moneyUnits: any): any {
+    public takeMoney(moneyUnits: IMoneyUnit[]) {
+        for (let i = 0; i < moneyUnits.length; i++) {
+            let curMoneyUnit = this._repository.find(moneyUnit =>
+                moneyUnit?.moneyInfo.denomination === moneyUnits[i].moneyInfo.denomination
+            && moneyUnit?.moneyInfo.currency === moneyUnits[i].moneyInfo.currency)
+            if (curMoneyUnit !== undefined)
+                curMoneyUnit.count += moneyUnits[i].count;
+            else
+                this._repository.push(moneyUnits[i]);
+        }
+    }
 
+    private sumMoney(currency: Currency) {
+        let sum = 0;
+        for (let i = 0; i < this._repository.length; i++) {
+            if (this._repository[i]?.moneyInfo.currency !== currency)
+                continue;
+            sum += Number(this._repository[i]?.moneyInfo.denomination) * this._repository[i]?.count;
+        }
+
+        return sum;
     }
 }
