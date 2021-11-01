@@ -15,7 +15,7 @@
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
 */
 
-import { Currency } from '../enums';
+import {Currency} from '../enums';
 
 export interface ICard {
 	id: string;
@@ -32,23 +32,24 @@ export interface IBankUser {
 }
 
 export class BankOffice {
-	private _users: any;
-	private _cards: any;
-
-	constructor(users: any, cards: any) {
+	private _users: Array<IBankUser>;
+	private _cards: Array<ICard>;
+	
+	constructor(users: Array<IBankUser>, cards: Array<ICard>) {
 		this._users = users;
 		this._cards = cards;
 	}
-
-	public authorize(userId: any, cardId: any, cardPin: any): any {
-
+	
+	public authorize(userId: string, cardId: string, cardPin: string): boolean {
+		return this._users.some((user: IBankUser) => user.id === userId
+			&& user.cards.some((card: ICard) => card.id === cardId && card.pin === cardPin))
 	}
-
-	public getCardById(cardId: any): any {
-
+	
+	public getCardById(cardId: string): ICard {
+		return this._cards.find((card: ICard) => card.id === cardId);
 	}
-
-	public isCardTiedToUser(cardId: any): any {
-
+	
+	public isCardTiedToUser(cardId: string): boolean {
+		return this._users.some((user: IBankUser) => user.cards.some((card: ICard) => card.id === cardId))
 	}
 }
