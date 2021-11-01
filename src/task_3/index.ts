@@ -18,7 +18,7 @@
 */
 
 import {UserSettingOptions} from '../enums';
-import {BankOffice, IBankUser} from "../task_2";
+import {BankOffice, IBankUser, ICard} from "../task_2";
 
 export class UserSettingsModule {
 	private _bankOffice: BankOffice;
@@ -33,7 +33,7 @@ export class UserSettingsModule {
 	}
 
 	private changeUserName(newName: string): boolean {
-		let oldName = this._user.name;
+		let oldName: string = this._user.name;
 		if (this._user.name !== newName) {
 			this._user.name = newName;
 		}
@@ -42,7 +42,7 @@ export class UserSettingsModule {
 	}
 
 	private changeUserSurname(newSurname: string): boolean {
-		let oldSurname = this._user.surname;
+		let oldSurname: string = this._user.surname;
 		if (this._user.surname !== newSurname) {
 			this._user.surname = newSurname;
 		}
@@ -51,7 +51,7 @@ export class UserSettingsModule {
 	}
 
 	private registerForUserNewCard(newCardId: string): boolean {
-		let card = this._bankOffice.getCardById(newCardId);
+		let card: ICard = this._bankOffice.getCardById(newCardId);
 		if (card !== undefined && !this._bankOffice.isCardTiedToUser(newCardId)) {
 			this._user.cards.push(card);
 			return true;
