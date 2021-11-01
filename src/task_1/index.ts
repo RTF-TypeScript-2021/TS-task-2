@@ -1,24 +1,8 @@
-/** Задача 1 - MoneyRepository
- * Имеется класс денежного хранилища - MoneyRepository.
- * Который должен хранить денежные единицы
- * разных валют, разного номинала и в разном количестве.
- * Требуется:
- * 1) Реализовать классу MoneyRepository 2 метода:
- *        1.1) giveOutMoney - позволяет достать денежные единицы из хранилища по принципу жадного алгоритма:
- *             сумма 1350RUB будет выдана
- *             одной купюрой номиналом 1000RUB,
- *             одной купюрой номиналом 200RUB,
- *             одной купюрой номиналом 100RUB,
- *             одной купюрой номиналом 50RUB
- *             с учетом, что все эти купюры будут находится в хранилище.
- *             Принимает аргументы count - сумма, требуемая к выдаче, currency - валюта
- *             Если сумма была собрана и выдана, то метод возвращает true, иначе false
- *        1.2) takeMoney - позволяет положить в хранилище денежные единицы разных номиналов и разного количества
- * 2) Типизировать все свойства и методы класса MoneyRepository,
- *      пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
- */
-
 import { Currency } from '../enums';
+
+interface IDictionary<T> {
+    [Key: string]: T;
+}
 
 interface IMoneyInfo {
     denomination: string;
@@ -30,18 +14,72 @@ export interface IMoneyUnit {
     count: number;
 }
 
+class MoneyValue {
+    private readonly linkedUnit: IMoneyUnit;
+    public get count(): number {
+        return this.linkedUnit.count;
+    }
+    public set count(value: number) {
+        this.linkedUnit.count = value;
+    }
+    public get denomination(): number {
+        return parseInt(this.linkedUnit.moneyInfo.denomination);
+    }
+
+    constructor(linkedUnit: IMoneyUnit) {
+        this.linkedUnit = linkedUnit;
+    }
+
+    public clone(): MoneyValue {
+        return new MoneyValue({...this.linkedUnit});
+    }
+}
+
 export class MoneyRepository {
-    private _repository: any;
+    private static readonly _denominations: Array<string> = ["1", "5", "10", "50", "100", "200", "500", "1000", "2000", "5000"];
+    private _repository: IDictionary<Array<MoneyValue>> = {};
+    private _balance: IDictionary<number> = {};
 
-    constructor(initialRepository: any) {
-        this._repository = initialRepository;
+    constructor(initialRepository: Array<IMoneyUnit>) {
+        if (initialRepository.some(unit => 
+            !MoneyRepository._denominations.includes(unit.moneyInfo.denomination))
+        ) { 
+            throw new Error("Invalid denomination received");
+        }
+
+        this.takeMoney(initialRepository);   
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(count: number, currency: Currency): boolean {
+        if (count < this._balance[currency] || !(currency in this._balance)) {
+            return false;
+        }
 
+        const currencyRep = {...this._repository}[currency]
+            .sort((x, y) => x.denomination - y.denomination)
+            .map(x => x.clone())
+        for (const value of currencyRep) {
+            while (count > 0 && value.denomination <= count && value.count > 0){
+                count -= value.denomination;
+                value.count -= 1;
+            }
+        }
+        if (count === 0) { 
+            this._repository[currency] = currencyRep.filter(value => value.count !== 0);
+        }
+
+        return count === 0;
     }
 
-    public takeMoney(moneyUnits: any): any {
-
+    public takeMoney(moneyUnits: Array<IMoneyUnit>): boolean {
+        for (const unit of moneyUnits) {
+            if (!(unit.moneyInfo.currency in this._repository)) {
+                this._repository[unit.moneyInfo.currency] = [];
+            }
+            this._repository[unit.moneyInfo.currency].push(new MoneyValue(unit));
+            this._balance[unit.moneyInfo.currency] += unit.count * parseInt(unit.moneyInfo.denomination);
+        }
+        
+        return true;
     }
 }
