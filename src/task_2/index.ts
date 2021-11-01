@@ -9,7 +9,7 @@
  * 			 Принимает аргументы userId - id пользователя, cardId - id банковской карты, cardPin - пин-код карты
  * 			 Если пользователь был успешно авторизован, то метод возвращает true, иначе false
  * 		1.2) getCardById - позволяет получить объект банковской карты из хранилища по id карты
- *		1.3) isCardTiedToUser - позволяет по id карты узнать, привзяана ли карта к какому-нибудь пользователю
+ *		1.3) isCardTiedToUser - позволяет по id карты узнать, привязана ли карта к какому-нибудь пользователю
  *			 возвращает true - если карта привязана к какому-нибудь пользователю, false в ином случае
  * 2) Типизировать все свойства и методы класса MoneyRepository,
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
@@ -32,23 +32,23 @@ export interface IBankUser {
 }
 
 export class BankOffice {
-	private _users: any;
-	private _cards: any;
+	private _users: Array<IBankUser>;
+	private _cards: Array<ICard>;
 
-	constructor(users: any, cards: any) {
-		this._users = users;
-		this._cards = cards;
+	constructor(users: Array<IBankUser>, cards: Array<ICard>) {
+	    this._users = users;
+	    this._cards = cards;
 	}
 
-	public authorize(userId: any, cardId: any, cardPin: any): any {
-
+	public authorize(userId: string, cardId: string, cardPin: string): boolean {
+	    return this._users.some(us => us.id === userId && us.cards.some(cr => cr.id === cardId && cr.pin === cardPin));
 	}
 
-	public getCardById(cardId: any): any {
-
+	public getCardById(cardId: string): ICard {
+	    return this._cards.find(cr => cr.id === cardId);
 	}
 
-	public isCardTiedToUser(cardId: any): any {
-
+	public isCardTiedToUser(cardId: string): boolean {
+	    return this._users.some(us => us.cards.some(cr => cr.id === cardId));
 	}
 }

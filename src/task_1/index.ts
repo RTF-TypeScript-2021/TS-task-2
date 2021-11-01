@@ -31,17 +31,36 @@ export interface IMoneyUnit {
 }
 
 export class MoneyRepository {
-    private _repository: any;
-
-    constructor(initialRepository: any) {
+    private _repository: IMoneyUnit[];
+    constructor(initialRepository: IMoneyUnit[]) {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(count: number, currency: Currency): boolean {
+        const money = this._repository.filter(x => x.moneyInfo.currency === currency).sort((x, y) =>{
+            const len = y.moneyInfo.denomination.length - x.moneyInfo.denomination.length;
+            if(len !== 0){
+                return len;
+            } else {
+                y.moneyInfo.denomination.localeCompare(x.moneyInfo.denomination);
+            }
+        });
 
+        money.forEach(money => {
+            const designation: number = parseInt(money.moneyInfo.denomination);
+            if (count >= designation) {
+                const accountNumber = Math.min(Math.floor(count / designation), money.count);
+                money.count -= accountNumber;
+                count -= accountNumber * designation;
+            }
+        });
+
+        return count === 0;
     }
 
-    public takeMoney(moneyUnits: any): any {
-
+    public takeMoney(moneyUnits: IMoneyUnit[]): void {
+        moneyUnits.forEach(moneyUnits => {
+            this._repository.find(x => x.moneyInfo.currency === moneyUnits.moneyInfo.currency && x.moneyInfo.denomination === moneyUnits.moneyInfo.denomination).count += moneyUnits.count;
+        });
     }
 }
