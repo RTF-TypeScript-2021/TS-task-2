@@ -26,12 +26,14 @@ export class CurrencyConverterModule {
 	}
 
 	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
-		if(fromCurrency === toCurrency || toCurrency === moneyUnits.moneyInfo.currency ||
+		if(fromCurrency === toCurrency || toCurrency === moneyUnits.moneyInfo!.currency ||
 			this.calculateSum(this._moneyRepository.repository, toCurrency) < this.calculateSum([moneyUnits], fromCurrency)){
 			return 0
 		}
 		const resultCount =  moneyUnits.moneyInfo.currency === Currency.RUB? moneyUnits.count*parseInt(moneyUnits.moneyInfo.denomination)/70 : moneyUnits.count*parseInt(moneyUnits.moneyInfo.denomination)*70
 		const denomination = toCurrency === Currency.RUB? '10' : '1'
+		this._moneyRepository.takeMoney([moneyUnits])
+		this._moneyRepository.giveOutMoney(resultCount, toCurrency)
 		moneyUnits = {
 			moneyInfo:{
 				denomination: denomination,

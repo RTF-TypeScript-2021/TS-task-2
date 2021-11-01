@@ -48,8 +48,6 @@ export class BankTerminal {
 		return false
 	}
 
-
-
 	public takeUsersMoney(moneyUnits: Array<IMoneyUnit>): boolean {
 		if (this._authorizedUser) {
 			this._targetCard.balance += this._targetCard.currency === Currency.USD? this._currencyConverterModule.calculateSum(moneyUnits, this._targetCard.currency)/70 : this._currencyConverterModule.calculateSum(moneyUnits, this._targetCard.currency)
