@@ -18,55 +18,55 @@
 */
 
 import { UserSettingOptions } from '../enums';
-import { BankOffice, IBankUser } from '../task_2';
+import { BankOffice, IBankUser, ICard } from '../task_2';
 
 export class UserSettingsModule {
 	private _bankOffice: BankOffice;
 	private _user: IBankUser;
 
 	public set user(user: IBankUser) {
-	    this._user = user;
+		this._user = user;
 	}
 
 	constructor(initialBankOffice: BankOffice) {
-	    this._bankOffice = initialBankOffice;
+		this._bankOffice = initialBankOffice;
 	}
 
-	private changeUserName(newName: string): boolean  {
-	    if (this.user && this.user.name !== newName) {
-	        this.user.name = newName
-			return true
-		}
-
-		return false
+	private changeUserName(newName: string): boolean {
+	    if (!this._user || this._user.name === newName) {
+	        return false;
+	    }
+	    this._user.name = newName;
+		
+	    return true;
 	}
 
 	private changeUserSurname(newSurname: string): boolean {
-	    if (this.user && this.user.surname !== newSurname) {
-			this.user.surname = newSurname
-			return true
-		}
+		if (!this._user || this._user.surname === newSurname) {
+	        return false;
+	    }
+	    this._user.surname = newSurname;
 
-		return false
+	    return true;
 	}
 
 	private registerForUserNewCard(newCardId: string): boolean {
-	    if(!this._bankOffice.isCardTiedToUser(newCardId) && this._bankOffice.getCardById(newCardId)){
+		if (!this._bankOffice.isCardTiedToUser(newCardId) && this._bankOffice.getCardById(newCardId)) {
 	        this._user.cards.push(this._bankOffice.getCardById(newCardId))
 	        return true
 	    }
-		
+
 	    return false
 	}
 
 	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
-	    switch (option) {
-	    case UserSettingOptions.name:
-	        return this.changeUserName(argsForChangeFunction)
-	    case UserSettingOptions.surname:
-	        return this.changeUserSurname(argsForChangeFunction)
-	    case UserSettingOptions.newCard:
-			return this.registerForUserNewCard(argsForChangeFunction)
+		switch (option) {
+			case UserSettingOptions.name:
+				return this.changeUserName(argsForChangeFunction)
+			case UserSettingOptions.surname:
+				return this.changeUserSurname(argsForChangeFunction)
+			case UserSettingOptions.newCard:
+				return this.registerForUserNewCard(argsForChangeFunction)
 	    }
-	} 
+	}
 }
