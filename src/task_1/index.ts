@@ -45,7 +45,7 @@ export class MoneyRepository {
                 return 1;
         }).reverse();
 
-        let sum = this.sumMoney(currency);
+        let sum: number = this.sumMoney(currency);
         if (sum < count) {
             return false;
         }
@@ -54,7 +54,7 @@ export class MoneyRepository {
 
         for (let i = 0; i < this._repository.length; i++) {
             for (let curCount = this._repository[i]?.count; curCount > 0; curCount--) {
-                const denomination = Number(this._repository[i].moneyInfo.denomination);
+                const denomination: number = Number(this._repository[i].moneyInfo.denomination);
                 if (denomination * curCount > count || currency !== this._repository[i].moneyInfo.currency)
                     continue;
 
@@ -72,7 +72,7 @@ export class MoneyRepository {
 
     public takeMoney(moneyUnits: IMoneyUnit[]) {
         for (let i = 0; i < moneyUnits.length; i++) {
-            let curMoneyUnit = this._repository.find(moneyUnit =>
+            let curMoneyUnit: IMoneyUnit = this._repository.find(moneyUnit =>
                 moneyUnit?.moneyInfo.denomination === moneyUnits[i].moneyInfo.denomination
             && moneyUnit?.moneyInfo.currency === moneyUnits[i].moneyInfo.currency)
             if (curMoneyUnit !== undefined)
@@ -82,12 +82,12 @@ export class MoneyRepository {
         }
     }
 
-    private sumMoney(currency: Currency) {
-        let sum = 0;
+    public sumMoney(currency: Currency, curCount = 0) { //this method is public because i use it in task4
+        let sum: number = 0;
         for (let i = 0; i < this._repository.length; i++) {
             if (this._repository[i]?.moneyInfo.currency !== currency)
                 continue;
-            sum += Number(this._repository[i]?.moneyInfo.denomination) * this._repository[i]?.count;
+            sum += Number(this._repository[i]?.moneyInfo.denomination) * this._repository[i]?.count - curCount;
         }
 
         return sum;
