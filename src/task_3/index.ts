@@ -17,33 +17,58 @@
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
 */
 
-import { UserSettingOptions } from '../enums';
+import {UserSettingOptions} from '../enums';
+import {BankOffice, IBankUser} from "../task_2";
 
 export class UserSettingsModule {
-	private _bankOffice: any;
-	private _user: any;
+	private _bankOffice: BankOffice;
+	private _user: IBankUser;
+	private _dictMethods : Map<UserSettingOptions,(x:string)=>boolean> = new Map<UserSettingOptions, (x: string) => boolean>()
+		.set(UserSettingOptions.name, (x)=>this.changeUserName(x))
+		.set(UserSettingOptions.surname, (x)=>this.changeUserSurname(x))
+		.set(UserSettingOptions.newCard,(x)=>this.registerForUserNewCard(x));
 
-	public set user(user: any) {
-		this._user = user;
+
+
+	public set user(user: IBankUser) {
+	    this._user = user;
 	}
 
-	constructor(initialBankOffice: any) {
-		this._bankOffice = initialBankOffice;
-	}
-
-	private changeUserName(newName: any): any {
-
-	}
-
-	private changeUserSurname(newSurname: any): any {
-
-	}
-
-	private registerForUserNewCard(newCardId: any): any {
+	constructor(initialBankOffice: BankOffice) {
+	    this._bankOffice = initialBankOffice;
 
 	}
 
-	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: any): any {
+	private changeUserName(newName: string): boolean {
+	    return this._user.name===newName?false:(()=>{
+	        this._user.name=newName;
 
+	        return true;
+	    })()
+	}
+
+	private changeUserSurname(newSurname: string): boolean {
+	    return this._user.surname===newSurname?false:(()=>{
+	        this._user.surname=newSurname;
+
+	        return true;
+	    })()
+
+	}
+
+	private registerForUserNewCard(newCardId: string): boolean {
+	    if(this._bankOffice.getCardById(newCardId)!==undefined
+			&& !this._bankOffice.isCardTiedToUser(newCardId)){
+	        this._user.cards.push(this._bankOffice.getCardById(newCardId));
+
+	        return true
+	    }
+		
+	    return false
+
+	}
+
+	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
+		return this._dictMethods.get(option)(argsForChangeFunction);
 	}
 }

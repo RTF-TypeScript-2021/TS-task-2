@@ -15,16 +15,27 @@
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
 */
 
-import { Currency } from '../enums';
+import {Currency} from '../enums';
+import {IMoneyUnit, MoneyRepository} from "../task_1";
 
 export class CurrencyConverterModule {
-	private _moneyRepository: any;
+	private _moneyRepository: MoneyRepository;
+	private _dictConvertCurrency : Map<Currency,(x:IMoneyUnit)=>number> = new Map<Currency, (x: IMoneyUnit) => number>()
+	    .set(Currency.USD,(x)=>this.convertMoney(x))
+	    .set(Currency.RUB, (x)=>this.convertMoney(x,1/70));
 
-	constructor(initialMoneyRepository: any) {
-		this._moneyRepository = initialMoneyRepository;
+	constructor(initialMoneyRepository: MoneyRepository) {
+	    this._moneyRepository = initialMoneyRepository;
 	}
 
-	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: any): any {
-
+	private convertMoney(unit:IMoneyUnit,price=70):number{
+	    return parseInt(unit.moneyInfo.denomination)*unit.count*price;
 	}
+	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
+		
+	    return fromCurrency===toCurrency 
+	        ? 0
+	        : this._dictConvertCurrency.get(fromCurrency)(moneyUnits)
+	}
+
 }

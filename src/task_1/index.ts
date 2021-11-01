@@ -31,17 +31,37 @@ export interface IMoneyUnit {
 }
 
 export class MoneyRepository {
-    private _repository: any;
+    private _repository: IMoneyUnit[];
 
-    constructor(initialRepository: any) {
+    constructor(initialRepository: IMoneyUnit[]) {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(amount: number, currency: Currency): boolean {
+        const tmpRepository :IMoneyUnit[] = this._repository
+            .filter(x=>x.moneyInfo.currency===currency
+                && x.count!==0)
+            .sort((x,y)=>parseInt(y.moneyInfo.denomination)-parseInt(x.moneyInfo.denomination));
 
+        tmpRepository.forEach(element => {
+            const denomination : number = parseInt(element.moneyInfo.denomination);
+            if(amount >=  denomination){
+                const countAmount = Math.min(Math.floor(amount/denomination),element.count);
+                amount-=countAmount*denomination;
+                element.count-=countAmount
+            }
+        });
+
+        return amount===0;
     }
 
-    public takeMoney(moneyUnits: any): any {
+    public takeMoney(moneyUnits: IMoneyUnit[]): boolean {
+        moneyUnits.forEach(element=>
+            this._repository
+                .find(x=>x.moneyInfo.currency===element.moneyInfo.currency
+                    && x.moneyInfo.denomination === element.moneyInfo.denomination)
+                .count += element.count ?? element.count)
 
+        return true
     }
 }
