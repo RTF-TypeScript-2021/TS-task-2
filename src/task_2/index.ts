@@ -32,23 +32,46 @@ export interface IBankUser {
 }
 
 export class BankOffice {
-	private _users: any;
-	private _cards: any;
+	private _users: IBankUser[];
+	private _cards: ICard[];
 
-	constructor(users: any, cards: any) {
+	constructor(users: IBankUser[], cards: ICard[]) {
 		this._users = users;
 		this._cards = cards;
 	}
 
-	public authorize(userId: any, cardId: any, cardPin: any): any {
-
+	public authorize(userId: string, cardId: string, cardPin: string): boolean {
+		let id = this._users.findIndex(user => user.id === userId);
+		if (id != -1) {
+			return this._users[id].cards
+				.filter(card => card.id === cardId && card.pin === cardPin)
+				.length > 0;
+		}
+		return false;
 	}
 
-	public getCardById(cardId: any): any {
+	public getCardById(cardId: string): ICard {
+		if (!this.contains(cardId, this._cards.map(x => x.id))) {
+			let cards: ICard[] = [];
+			this._users.forEach(user => {
+				user.cards.forEach(card => {
+					cards.push(card);
+				})
+			});
+			return cards[cards.findIndex(card => card.id === cardId)]
+		}
 
+		return this._cards[
+			this._cards.findIndex(card => card.id === cardId)
+		];
 	}
 
-	public isCardTiedToUser(cardId: any): any {
+	public isCardTiedToUser(cardId: string): boolean {
+		return this._users.findIndex(user => this.contains(cardId, user.cards.map(x => x.id))) != -1
+	}
 
+	private contains(item: any, items: any[]): boolean {
+		let index = items.findIndex(x => x === item);
+		return index != -1;
 	}
 }

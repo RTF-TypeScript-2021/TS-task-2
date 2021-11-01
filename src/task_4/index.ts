@@ -16,15 +16,30 @@
 */
 
 import { Currency } from '../enums';
+import { IMoneyUnit, MoneyRepository } from '../task_1';
 
 export class CurrencyConverterModule {
-	private _moneyRepository: any;
+	private _moneyRepository: MoneyRepository;
 
-	constructor(initialMoneyRepository: any) {
+	constructor(initialMoneyRepository: MoneyRepository) {
 		this._moneyRepository = initialMoneyRepository;
 	}
 
-	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: any): any {
+	public convertMoneyUnits(from: Currency, to: Currency, moneyUnits: IMoneyUnit): number {
+		return parseInt(moneyUnits.moneyInfo.denomination) * moneyUnits.count
+			* this.getCurrencyRelationship(from, to);
+	}
 
+	private getCurrencyRelationship(from: Currency, to: Currency){
+		switch (from) {
+			case to:
+				return 0;
+			case Currency.RUB:
+				return 1 / 70;
+			case Currency.USD:
+				return 70;
+			default:
+				return -1;
+		}
 	}
 }

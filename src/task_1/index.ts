@@ -30,18 +30,37 @@ export interface IMoneyUnit {
     count: number;
 }
 
-export class MoneyRepository {
-    private _repository: any;
+export class MoneyRepository{
+    private moneyUnits: IMoneyUnit[];
 
-    constructor(initialRepository: any) {
-        this._repository = initialRepository;
+    constructor(moneyUnits: IMoneyUnit[]) {
+        this.moneyUnits = moneyUnits;
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(count: number, currency: Currency): Boolean {
+        const units :IMoneyUnit[] = this.moneyUnits
+            .filter(x => x.moneyInfo.currency === currency)
+            .sort((x, y) => Number(y.moneyInfo.denomination)- Number(x.moneyInfo.denomination));
 
+            units.forEach(unit => {
+            const denomination: number = Number(unit.moneyInfo.denomination);
+            if (count >= denomination) {
+                const billCount = Math.min(Math.floor(count / denomination), unit.count);
+                count -= billCount * denomination;
+                unit.count -= billCount;
+            }
+        });
+
+        return count === 0;
     }
 
-    public takeMoney(moneyUnits: any): any {
-
+    public takeMoney(moneyUnits: IMoneyUnit[]): void {
+        moneyUnits.forEach(unit => this.moneyUnits.push(unit));
     }
 }
+
+/*currency: {
+      {5000: 2},
+      {45, 5},
+      {23, 1}
+ }*/
