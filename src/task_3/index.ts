@@ -17,33 +17,53 @@
  * 	  пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
 */
 
-import { UserSettingOptions } from '../enums';
+import {UserSettingOptions} from '../enums';
+import {BankOffice, IBankUser} from "../task_2";
 
 export class UserSettingsModule {
-	private _bankOffice: any;
-	private _user: any;
+	private _bankOffice: BankOffice;
+	private _user: IBankUser;
 
-	public set user(user: any) {
+	public set user(user: IBankUser) {
 		this._user = user;
 	}
 
-	constructor(initialBankOffice: any) {
+	constructor(initialBankOffice: BankOffice) {
 		this._bankOffice = initialBankOffice;
 	}
 
-	private changeUserName(newName: any): any {
+	private changeUserName(newName: string): boolean {
+		let oldName = this._user.name;
+		if (this._user.name !== newName) {
+			this._user.name = newName;
+		}
 
+		return oldName !== newName;
 	}
 
-	private changeUserSurname(newSurname: any): any {
+	private changeUserSurname(newSurname: string): boolean {
+		let oldSurname = this._user.surname;
+		if (this._user.surname !== newSurname) {
+			this._user.surname = newSurname;
+		}
 
+		return oldSurname !== newSurname;
 	}
 
-	private registerForUserNewCard(newCardId: any): any {
+	private registerForUserNewCard(newCardId: string): boolean {
+		let card = this._bankOffice.getCardById(newCardId);
+		if (card !== undefined && !this._bankOffice.isCardTiedToUser(newCardId)) {
+			this._user.cards.push(card);
+			return true;
+		}
 
+		return false;
 	}
 
-	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: any): any {
-
+	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
+		return option === UserSettingOptions.name ? this.changeUserName(argsForChangeFunction)
+			: (option === UserSettingOptions.surname ? this.changeUserSurname(argsForChangeFunction)
+			: option === UserSettingOptions.newCard ? this.registerForUserNewCard(argsForChangeFunction)
+					: false);
 	}
 }
