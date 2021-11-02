@@ -21,27 +21,58 @@
 import { Currency } from '../enums';
 
 interface IMoneyInfo {
-    denomination: string;
-    currency: Currency;
+    denomination: string; //
+    currency: Currency;// валюта (доллар или рубли)
 }
 
 export interface IMoneyUnit {
-    moneyInfo: IMoneyInfo;
-    count: number;
+    moneyInfo: IMoneyInfo; // тип денег
+    count: number; // номинал
 }
 
 export class MoneyRepository {
-    private _repository: any;
+    private _repository: IMoneyUnit[]; // IMoneyUnit[] - хрен, придумываем другой тип
 
-    constructor(initialRepository: any) {
+    constructor(initialRepository: IMoneyUnit[]) {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(count: number, currency: Currency): boolean { // выдать денег
+        this._repository.sort(compareFunction)
 
+        function compareFunction(x: IMoneyUnit, y: IMoneyUnit) : number {
+            if (x.count > y.count) {
+                return -1;
+            } else if (x.count === y.count) {
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+
+        for (const i of this._repository){
+            if (i.moneyInfo.currency === currency){
+                const d = Math.floor(count / Number(i.moneyInfo.denomination));
+                if (d >= 1) {
+                    count -= Number(i.moneyInfo.denomination) * Math.min(d, i.count);
+                    i.count -= Math.min(d, i.count);
+                }
+            }
+        }
+
+        return count === 0;
     }
 
-    public takeMoney(moneyUnits: any): any {
-
+    public takeMoney(moneyUnits: IMoneyUnit[]): void {
+        for (const i of moneyUnits){
+            const denomination = this._repository.findIndex((x) =>
+                x.moneyInfo.denomination === i.moneyInfo.denomination &&
+                x.moneyInfo.currency === i.moneyInfo.currency);
+            if (denomination !== -1){
+                this._repository[denomination].count += i.count
+            } else {
+                this._repository.concat(moneyUnits)
+            }
+        }
     }
 }
