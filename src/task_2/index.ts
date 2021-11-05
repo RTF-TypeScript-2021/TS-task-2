@@ -41,23 +41,37 @@ export class BankOffice {
 	}
 
 	public authorize(userId: string, cardId: string, cardPin: string): boolean {
-     const user = this._users.find(x => x.id === userId);
-     if (user === undefined){
-         return false
-     }
-     const card = user.cards.find(x => x.id === cardId);
-     if (card === undefined){
-         return false
+		let id = this._users.findIndex(user => user.id === userId);
+		if (id != -1) {
+			return this._users[id].cards
+				.filter(card => card.id === cardId && card.pin === cardPin)
+				.length > 0;
+		}
+		return false;
      }
 
-     return card.pin === cardPin
+
+	 public getCardById(cardId: string): ICard {
+		if (!this.contains(cardId, this._cards.map(x => x.id))) {
+			let cards: ICard[] = [];
+			this._users.forEach(user => {
+				user.cards.forEach(card => {
+					cards.push(card);
+				})
+			});
+			return cards[cards.findIndex(card => card.id === cardId)]
+		}
+
+		return this._cards[
+			this._cards.findIndex(card => card.id === cardId)
+		];
 	}
-
 	public isCardTiedToUser(cardId: string): boolean {
-     return this._users.some((user) => {
-         if (user.cards.find(x => x.id === cardId)) {
-             return true;
-         }
-     })
+		return this._users.findIndex(user => this.contains(cardId, user.cards.map(x => x.id))) != -1
 	}
-}
+
+	private contains(item: any, items: any[]): boolean {
+		let index = items.findIndex(x => x === item);
+		return index != -1;
+	}
+} 
