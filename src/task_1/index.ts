@@ -31,17 +31,48 @@ export interface IMoneyUnit {
 }
 
 export class MoneyRepository {
-    private _repository: any;
+    private _repository: Array<IMoneyUnit>;
 
-    constructor(initialRepository: any) {
+    constructor(initialRepository:  Array<IMoneyUnit>) {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(count: number, currency: Currency): boolean {
+        if (this._repository.length === 0){
+            return false;
+        }
+        let moneyCurrency: Array<IMoneyUnit> = [];
+        for (const unit of this._repository) {
+            moneyCurrency.push(Object.assign({}, unit));
+        }
+        moneyCurrency = this._repository.filter(unit => unit.moneyInfo.currency === currency);
+        moneyCurrency = moneyCurrency.sort(function(a, b) {
+            const c = Number(a.moneyInfo.denomination);
+            const d = Number(b.moneyInfo.denomination);
 
+            return d > c? 1: d < c ? -1: 0;
+        })
+
+        moneyCurrency.forEach(moneyUnit => {
+            const money = Number(moneyUnit.moneyInfo.denomination)
+            const valueCount = Math.floor(count/money);
+            const rightCount = valueCount < moneyUnit.count ? valueCount : moneyUnit.count;
+            count -= money * rightCount;  
+            moneyUnit.count -= rightCount;
+        });
+
+        if (count !== 0) {
+            this._repository = moneyCurrency;
+
+            return false;   
+        } 
+
+        return true;
     }
 
-    public takeMoney(moneyUnits: any): any {
-
+    public takeMoney(moneyUnits: Array<IMoneyUnit>): void {
+        for (const unit of moneyUnits){
+            this._repository.push(unit);
+        }
     }
 }
