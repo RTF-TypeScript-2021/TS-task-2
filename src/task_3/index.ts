@@ -18,6 +18,7 @@
 */
 
 import { UserSettingOptions } from '../enums';
+import { IBankUser, BankOffice } from '../task_2/index';
 
 export class UserSettingsModule {
 	private _bankOffice: BankOffice;
