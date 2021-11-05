@@ -37,42 +37,29 @@ export class MoneyRepository {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: number, currency: Currency): boolean {
-        if (this._repository.length === 0){
-            return false;
+        public giveOutMoney(count: number, currency: Currency): boolean {
+            this._repository.sort((x,y) => parseInt(y.moneyInfo.denomination) - parseInt(x.moneyInfo.denomination)); 
+            for (const unit of this._repository) {
+                const denomination: number = parseInt(unit.moneyInfo.denomination);
+                const ost: number = count/denomination;
+                if (unit.moneyInfo.currency === currency && denomination <= count && unit.count !== 0) {
+                    if (ost > unit.count) {
+                        count -= unit.count * denomination;
+                        unit.count = 0;
+                    } else {
+                        count -= ost * denomination;
+                        unit.count -= ost;
+                    }
+                }
+            }
+    
+            return count === 0;
         }
-        let moneyCurrency: Array<IMoneyUnit> = [];
-        for (const unit of this._repository) {
-            moneyCurrency.push(Object.assign({}, unit));
-        }
-        moneyCurrency = this._repository.filter(unit => unit.moneyInfo.currency === currency);
-        moneyCurrency = moneyCurrency.sort(function(a, b) {
-            const c = Number(a.moneyInfo.denomination);
-            const d = Number(b.moneyInfo.denomination);
-
-            return d > c? 1: d < c ? -1: 0;
-        })
-
-        moneyCurrency.forEach(moneyUnit => {
-            const money = Number(moneyUnit.moneyInfo.denomination)
-            const valueCount = Math.floor(count/money);
-            const rightCount = valueCount < moneyUnit.count ? valueCount : moneyUnit.count;
-            count -= money * rightCount;  
-            moneyUnit.count -= rightCount;
-        });
-
-        if (count !== 0) {
-            this._repository = moneyCurrency;
-
-            return false;   
-        } 
-
-        return true;
-    }
-
-    public takeMoney(moneyUnits: Array<IMoneyUnit>): void {
-        for (const unit of moneyUnits){
-            this._repository.push(unit);
+    
+        public takeMoney(moneyUnits: IMoneyUnit[]): void {
+            moneyUnits.forEach(moneyUnits => {
+                this._repository.find(unit => unit.moneyInfo.currency === moneyUnits.moneyInfo.currency 
+                    && unit.moneyInfo.denomination === moneyUnits.moneyInfo.denomination).count += moneyUnits.count;
+            });
         }
     }
-}
