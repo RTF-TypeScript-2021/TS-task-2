@@ -21,46 +21,50 @@
 import { Currency } from '../enums';
 
 interface IMoneyInfo {
-    denomination: string; //
-    currency: Currency;// валюта (доллар или рубли)
+    denomination: string;
+    currency: Currency;
 }
 
 export interface IMoneyUnit {
-    moneyInfo: IMoneyInfo; // тип денег
-    count: number; // номинал
+    moneyInfo: IMoneyInfo;
+    count: number;
 }
 
 export class MoneyRepository {
-    private _repository: IMoneyUnit[]; // IMoneyUnit[] - хрен, придумываем другой тип
+    private _repository: IMoneyUnit[];
 
     constructor(initialRepository: IMoneyUnit[]) {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: number, currency: Currency): boolean { // выдать денег
+    public giveOutMoney(count: number, currency: Currency): boolean {
         this._repository.sort(compareFunction)
 
         function compareFunction(x: IMoneyUnit, y: IMoneyUnit) : number {
-            if (x.count > y.count) {
+            if (Number(x.moneyInfo.denomination) > Number(y.moneyInfo.denomination)) {
                 return -1;
-            } else if (x.count === y.count) {
+            } else if (Number(x.moneyInfo.denomination) === Number(y.moneyInfo.denomination)) {
                 return 0;
             } else {
                 return 1;
             }
         }
 
-        for (const i of this._repository){
+        outerLoop: for (const i of this._repository){
             if (i.moneyInfo.currency === currency){
-                const d = Math.floor(count / Number(i.moneyInfo.denomination));
-                if (d >= 1) {
-                    count -= Number(i.moneyInfo.denomination) * Math.min(d, i.count);
-                    i.count -= Math.min(d, i.count);
+                for(let j = i.count; j != 0; j--){
+                    if (Number(i.moneyInfo.denomination) <= count){
+                        count -= Number(i.moneyInfo.denomination);
+                        i.count -= 1;
+                        if(count == 0){
+                            break outerLoop;
+                        }
+                    }
                 }
             }
         }
 
-        return count === 0;
+        return count == 0;
     }
 
     public takeMoney(moneyUnits: IMoneyUnit[]): void {

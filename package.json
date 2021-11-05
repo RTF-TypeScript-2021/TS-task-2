@@ -1,24 +1,32 @@
 {
-    "name": "js-task-6",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "test": "jest",
-        "build": "rimraf ./dist && tsc"
-    },
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-        "tsc-watch": "^4.5.0"
-    },
-    "devDependencies": {
-        "@types/jest": "^27.0.2",
-        "@typescript-eslint/eslint-plugin": "^5.1.0",
-        "@typescript-eslint/parser": "^5.1.0",
-        "eslint": "^7.32.0",
-        "jest": "^27.3.1",
-        "ts-jest": "^27.0.7",
-        "typescript": "^4.4.4"
-    }
+  "name": "ts-task-2",
+  "version": "1.0.0",
+  "description": "[Лекции](https://www.youtube.com/channel/UCfoHH5J1ui5owLi0h7k__MQ/playlists) выложены на YouTube и разделены по плейлистам",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "rimraf ./dist && tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tsc-watch": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.1.0",
+    "@typescript-eslint/parser": "^5.1.0",
+    "eslint": "^7.32.0",
+    "jest": "^27.3.1",
+    "ts-jest": "^27.0.7",
+    "typescript": "^4.4.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Helloeverybody/TS-task-2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Helloeverybody/TS-task-2/issues"
+  },
+  "homepage": "https://github.com/Helloeverybody/TS-task-2#readme"
 }
