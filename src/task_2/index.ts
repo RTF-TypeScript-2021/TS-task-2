@@ -44,41 +44,39 @@ export class BankOffice {
 	}
 
 	public authorize(userId: string, cardId: string, cardPin: string): boolean {
-        for (const user of this._users) {
-            if (user.id === userId) {
-                for (const card of user.cards) {
-                    if (cardId === card.id || card.pin === cardPin) {
-                        return true;
-                    }
-                }
-            }
+        const userOrUndefined = this._users.find((user: IBankUser) => user.id === userId);
+        if (!userOrUndefined) {
+            return false;
+        }
+        const cardOrUndefined = userOrUndefined.cards.find((card: ICard) => cardId === card.id || card.pin === cardPin)
+        if (!cardOrUndefined) {
+            return false
         }
 
-        return false;
+        return true;
 	}
 
-	public getCardById(cardId: string): object {
-	    const cardOrNull = this._getCard(cardId)
-        if (cardOrNull !== undefined) {
-            return cardOrNull;
+	public getCardById(cardId: string): ICard {
+	    const cardFromUsers = this._getCard(cardId)
+        if (cardFromUsers) {
+            return cardFromUsers;
         } 
-        for (const card of this._cards) {
-            if (cardId === card.id) {
-                return card;
-            }
+        const cardFromCards = this._cards.find((card: ICard) => cardId === card.id)
+        if (cardFromCards) {
+            return cardFromCards
         }
 	}
 
 	public isCardTiedToUser(cardId: string): boolean {
-        const cardOrNull = this._getCard(cardId);
-        if (cardOrNull !== undefined) {
-            return true;
+        const cardFromUsers = this._getCard(cardId);
+        if (!cardFromUsers) {
+            return false;
         }
 
-        return false;
+        return true;
 	}
 
-    private _getCard(cardId: string): object {
+    private _getCard(cardId: string): ICard {
         for (const bankUser of this._users) {
             for (const card of bankUser.cards){
                 if (card.id === cardId) {

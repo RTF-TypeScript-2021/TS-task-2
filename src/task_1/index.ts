@@ -45,24 +45,13 @@ export class MoneyRepository {
          for (const unit of this._repository) {
              moneyUnits.push(Object.assign({}, unit));
          }
-         moneyUnits = this._repository.filter(unit => unit.moneyInfo.currency === currency);
-         moneyUnits = moneyUnits.sort(function(a, b) {
+         moneyUnits = this._repository.filter((unit: IMoneyUnit) => unit.moneyInfo.currency === currency);
+         moneyUnits = moneyUnits.sort(function(a: IMoneyUnit, b: IMoneyUnit) {
              const c = Number(a.moneyInfo.denomination);
              const d = Number(b.moneyInfo.denomination);
  
              return d > c? 1: d < c ? -1: 0;
          })
-         /*
-         const values: Array<Array<number>> = []; 
-         for (const unit of this._repository){
-             if (unit.moneyInfo.currency === currency) {
-                 values.push([Number(unit.moneyInfo.denomination), unit.count]);
-             }
-         }
-         values.sort(function(a,b) {
-             return b[0]>a[0]? 1: b[0]<a[0]? -1: 0;
-         })
-         */
          moneyUnits.forEach(moneyUnit => {
              const money = Number(moneyUnit.moneyInfo.denomination)
              const valueCount = Math.floor(count/money);
@@ -81,8 +70,13 @@ export class MoneyRepository {
      }
  
      public takeMoney(moneyUnits: Array<IMoneyUnit>): void {
-         for (const unit of moneyUnits){
-             this._repository.push(unit);
+         for (const moneyUnit of moneyUnits){
+             const unit = this._repository.find((unit: IMoneyUnit) => unit.moneyInfo.denomination === moneyUnit.moneyInfo.denomination);
+             if (unit) {
+                 unit.count += moneyUnit.count;
+             } else {
+                 this._repository.push(moneyUnit);
+             }
          }
      }
 }

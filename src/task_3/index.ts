@@ -20,7 +20,7 @@
 */
 
 import { UserSettingOptions } from '../enums';
-import { BankOffice, IBankUser } from '../task_2';
+import { BankOffice, IBankUser, ICard } from '../task_2';
 
 export class UserSettingsModule {
 	private _bankOffice: BankOffice;
@@ -62,7 +62,7 @@ export class UserSettingsModule {
         if (isCardTiedToUser){
             return false;
         }
-        const isBankHavingCard: object = this._bankOffice.getCardById(newCardId);
+        const isBankHavingCard: ICard = this._bankOffice.getCardById(newCardId);
         if (isBankHavingCard === undefined) {
             return false;
         }
