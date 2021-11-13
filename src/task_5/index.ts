@@ -45,8 +45,12 @@ export class BankTerminal {
 	}
 
 	public takeUsersMoney(moneyUnits: IMoneyUnit[]): boolean {
-		this._moneyRepository.takeMoney(moneyUnits);
-		return true;
+		try{
+			this._moneyRepository.takeMoney(moneyUnits);
+			return true;
+		} catch {
+			return false;
+		}
 	}
 
 	public giveOutUsersMoney(count: number): boolean {

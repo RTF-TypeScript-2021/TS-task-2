@@ -33,23 +33,26 @@ export class UserSettingsModule {
 	}
 
 	private changeUserName(newName: string): boolean {
-		if(this._user === undefined){
+		if(!this._user || !newName){
 			return false;
 		}
-		let name = this._user.name;
+		const name = this._user.name;
 		this._user.name = newName;
-		return name != newName;
+		return name !== newName;
 	}
 
 	private changeUserSurname(newSurname: string): boolean {
-		let surname = this._user.surname;
+		if(!this._user || !newSurname){
+			return false;
+		}
+		const surname = this._user.surname;
 		this._user.surname = newSurname;
-		return surname != newSurname;
+		return surname !== newSurname;
 	}
 
 	private registerForUserNewCard(newCardId: string): boolean {
-		let card = this._bankOffice.getCardById(newCardId)
-		if (card !== undefined && !this._bankOffice.isCardTiedToUser(newCardId)){
+		const card = this._bankOffice.getCardById(newCardId)
+		if (!!card && !this._bankOffice.isCardTiedToUser(newCardId)){
 			this._user.cards.push(card);
 			return true;
 		}
@@ -57,11 +60,11 @@ export class UserSettingsModule {
 	}
 
 	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
-		if (option == 0){
+		if (option === 0){
 			return this.changeUserName(argsForChangeFunction);
-		} else if (option == 1){
+		} else if (option === 1){
 			return this.changeUserSurname(argsForChangeFunction);
-		} else if (option == 2){
+		} else if (option === 2){
 			return this.registerForUserNewCard(argsForChangeFunction);
 		} else {
 			return false;

@@ -56,7 +56,7 @@ export class MoneyRepository {
                     if (Number(i.moneyInfo.denomination) <= count){
                         count -= Number(i.moneyInfo.denomination);
                         i.count -= 1;
-                        if(count == 0){
+                        if(count === 0){
                             break outerLoop;
                         }
                     }
@@ -68,12 +68,12 @@ export class MoneyRepository {
     }
 
     public takeMoney(moneyUnits: IMoneyUnit[]): void {
-        for (const i of moneyUnits){
+        for (const moneyUnit of moneyUnits){
             const denomination = this._repository.findIndex((x) =>
-                x.moneyInfo.denomination === i.moneyInfo.denomination &&
-                x.moneyInfo.currency === i.moneyInfo.currency);
+                x.moneyInfo.denomination === moneyUnit.moneyInfo.denomination &&
+                x.moneyInfo.currency === moneyUnit.moneyInfo.currency);
             if (denomination !== -1){
-                this._repository[denomination].count += i.count
+                this._repository[denomination].count += moneyUnit.count
             } else {
                 this._repository.concat(moneyUnits)
             }

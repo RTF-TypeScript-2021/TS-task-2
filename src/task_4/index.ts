@@ -26,7 +26,7 @@ export class CurrencyConverterModule {
 	}
 
 	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
-		let count = moneyUnits.count * Number(moneyUnits.moneyInfo.denomination);
+		const count = moneyUnits.count * Number(moneyUnits.moneyInfo.denomination);
 		let converted;
 		if (fromCurrency == toCurrency){
 			converted = 0;

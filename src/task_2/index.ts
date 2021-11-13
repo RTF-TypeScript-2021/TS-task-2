@@ -42,11 +42,9 @@ export class BankOffice {
 
 	public authorize(userId: string, cardId: string, cardPin: string): boolean {
 		if (this.isCardTiedToUser(cardId)){
-			let user = this._users.find((x: { id: string; }) => x.id === userId);
-			let card = user.cards.find((x: { id: string; }) => x.id === cardId)
-			if(card !== undefined && card.pin == cardPin){
-				return true;
-			}
+			const user = this._users.find((x: { id: string; }) => x.id === userId);
+			const card = user.cards.find((x: { id: string; }) => x.id === cardId)
+			return !!card && card.pin === cardPin;
 		}
 		return false;
 	}
@@ -61,6 +59,6 @@ export class BankOffice {
 	}
 
 	public isCardTiedToUser(cardId: string): boolean {
-		return this._cards.find((x: { id: string; }) => x.id === cardId) === undefined;
+		return !!this._users.find((user: { cards: Array<ICard>; }) => user.cards.find((x: { id: string; }) => x.id === cardId));
 	}
 }
