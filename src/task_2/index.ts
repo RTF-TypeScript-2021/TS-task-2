@@ -44,7 +44,7 @@ export class BankOffice {
 		const user: IBankUser = this._users.find(user => user.id === userId);
 		const card: ICard = user.cards.find(card => card.id === cardId);
 
-		return !user && card.pin === cardPin;
+		return !!user && card?.pin === cardPin;
 	}
 
 	public getCardById(cardId: string): ICard {
