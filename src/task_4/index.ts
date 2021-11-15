@@ -26,18 +26,17 @@ export class CurrencyConverterModule {
 	}
 
 	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
-		let result: number = 0;
-		if (fromCurrency === toCurrency) {
-			return result;
+		switch (toCurrency) {
+			case fromCurrency:
+				return 0;
+			case Currency.RUB:
+				return moneyUnits.count * Number(moneyUnits.moneyInfo.denomination) * 70;
+			case Currency.USD:
+				if (moneyUnits.count * Number(moneyUnits.moneyInfo.denomination) % 70 === 0)
+					return moneyUnits.count * Number(moneyUnits.moneyInfo.denomination) / 70;
+				break;
+			default:
+				throw new Error("This currency does not exist");
 		}
-
-		if (toCurrency === Currency.RUB) {
-			result = moneyUnits.count * Number(moneyUnits.moneyInfo.denomination) * 70;
-		}
-		if (toCurrency === Currency.USD && moneyUnits.count * Number(moneyUnits.moneyInfo.denomination) % 70 === 0) {
-			result = moneyUnits.count * Number(moneyUnits.moneyInfo.denomination) / 70;
-		}
-
-		return result;
 	}
 }
