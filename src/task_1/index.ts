@@ -46,7 +46,6 @@ export class MoneyRepository {
                 return 1;
             }
         }).reverse();
-
         let sum: number = this.sumMoney(currency);
         if (sum < count) {
             return false;
@@ -59,19 +58,16 @@ export class MoneyRepository {
                 if (denomination * curCount > count || currency !== this._repository[i]?.moneyInfo.currency) {
                     continue;
                 }
-
                 sum += denomination * curCount;
                 if (this._repository[i].count === curCount) {
                     delete this._repository[i];
                 } else {
                     this._repository[i].count--;
                 }
-
                 if (sum === count) {
                     break;
                 }
             }
-
             if (sum === count) {
                 break;
             }
@@ -80,9 +76,10 @@ export class MoneyRepository {
         return sum === count;
     }
 
-    public takeMoney(moneyUnits: IMoneyUnit[]): boolean {
+    public takeMoney(moneyUnits: IMoneyUnit[]): void {
         for (let i = 0; i < moneyUnits.length; i++) {
-            let curMoneyUnit: IMoneyUnit = this._repository.find(moneyUnit =>
+            const curMoneyUnit: IMoneyUnit = this._repository.find
+            (moneyUnit =>
                 moneyUnit?.moneyInfo.denomination === moneyUnits[i].moneyInfo.denomination
             && moneyUnit?.moneyInfo.currency === moneyUnits[i].moneyInfo.currency)
             if (curMoneyUnit !== undefined) {
@@ -91,11 +88,9 @@ export class MoneyRepository {
                 this._repository.push(moneyUnits[i]);
             }
         }
-
-        return true;
     }
 
-    public sumMoney(currency: Currency) { //this method is public because i use it in task4
+    private sumMoney(currency: Currency) {
         let sum: number = 0;
         for (let i = 0; i < this._repository.length; i++) {
             if (this._repository[i]?.moneyInfo.currency !== currency) {
