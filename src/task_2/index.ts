@@ -68,7 +68,7 @@ export class BankOffice {
 		return this._users.findIndex((user: IBankUser) => this.contains(cardId, user.cards.map(x => x.id))) !== -1
 	}
 
-	private contains(item: ICard, items: Array<ICard>): boolean {
+	private contains(item: string, items: string[]): boolean {
 		const index = items.findIndex(x => x === item);
 		return index !== -1;
 	}
