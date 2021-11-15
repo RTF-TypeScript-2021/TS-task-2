@@ -32,24 +32,22 @@ export class UserSettingsModule {
 		this._bankOffice = initialBankOffice;
 	}
 
-	private changeUserName(newName: string): boolean {
-		const oldName: string = this._user?.name;
-		if (this._user.name === newName) {
+	private changeUserName(newName: string): boolean  {
+		if (!this._user || this._user.name === newName) {
 			return false;
 		}
-
 		this._user.name = newName;
-		return oldName !== newName;
+
+		return true;
 	}
 
 	private changeUserSurname(newSurname: string): boolean {
-		const oldSurname: string = this._user?.surname;
-		if (this._user.surname === newSurname) {
+		if (!this._user || this._user.surname === newSurname) {
 			return false;
 		}
-
 		this._user.surname = newSurname;
-		return oldSurname !== newSurname;
+
+		return true;
 	}
 
 	private registerForUserNewCard(newCardId: string): boolean {

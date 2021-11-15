@@ -80,8 +80,8 @@ export class MoneyRepository {
         for (let i = 0; i < moneyUnits.length; i++) {
             const curMoneyUnit: IMoneyUnit = this._repository.find
             (moneyUnit => moneyUnit?.moneyInfo.denomination === moneyUnits[i].moneyInfo.denomination
-            && moneyUnit?.moneyInfo.currency === moneyUnits[i].moneyInfo.currency)
-            if (!curMoneyUnit) {
+                && moneyUnit?.moneyInfo.currency === moneyUnits[i].moneyInfo.currency)
+            if (!!curMoneyUnit) {
                 curMoneyUnit.count += moneyUnits[i].count;
             } else {
                 this._repository.push(moneyUnits[i]);
