@@ -51,8 +51,7 @@ export class UserSettingsModule {
 	}
 
 	private registerForUserNewCard(newCardId: string): boolean {
-		return !!this._bankOffice.getCardById(newCardId)
-			&& this._user.cards.findIndex(card => card.id === newCardId) === -1;
+		return !!this._bankOffice.getCardById(newCardId) && this._user.cards.findIndex(card => card.id === newCardId) === -1;
 
 	}
 

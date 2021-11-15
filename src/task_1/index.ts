@@ -38,7 +38,7 @@ export class MoneyRepository {
     }
 
         public giveOutMoney(count: number, currency: Currency): boolean {
-            this._repository.sort((x,y) => parseInt(y.moneyInfo.denomination) - parseInt(x.moneyInfo.denomination)); 
+            this._repository.sort((x, y: IMoneyUnit) => parseInt(y.moneyInfo.denomination) - parseInt(x.moneyInfo.denomination)); 
             for (const unit of this._repository) {
                 const denomination: number = parseInt(unit.moneyInfo.denomination);
                 const ost: number = count/denomination;

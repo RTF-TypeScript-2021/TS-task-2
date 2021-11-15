@@ -41,11 +41,9 @@ export class BankOffice {
 	}
 
 	public authorize(userId: string, cardId: string, cardPin: string): boolean {
-		let id = this._users.findIndex(user => user.id === userId);
-		if (id != -1) {
-			return this._users[id].cards
-				.filter(card => card.id === cardId && card.pin === cardPin)
-				.length > 0;
+		const id = this._users.findIndex((user: IBankUser) => user.id === userId);
+		if (id !== -1) {
+			return this._users[id].cards.filter((card: ICard) => card.id === cardId && card.pin === cardPin).length > 0;
 		}
 		return false;
      }
@@ -53,25 +51,25 @@ export class BankOffice {
 
 	 public getCardById(cardId: string): ICard {
 		if (!this.contains(cardId, this._cards.map(x => x.id))) {
-			let cards: ICard[] = [];
-			this._users.forEach(user => {
-				user.cards.forEach(card => {
+			const cards: ICard[] = [];
+			this._users.forEach((user: IBankUser) => {
+				user.cards.forEach((card: ICard) => {
 					cards.push(card);
 				})
 			});
-			return cards[cards.findIndex(card => card.id === cardId)]
+			return cards[cards.findIndex((card: ICard) => card.id === cardId)]
 		}
 
 		return this._cards[
-			this._cards.findIndex(card => card.id === cardId)
+			this._cards.findIndex((card: ICard) => card.id === cardId)
 		];
 	}
 	public isCardTiedToUser(cardId: string): boolean {
-		return this._users.findIndex(user => this.contains(cardId, user.cards.map(x => x.id))) != -1
+		return this._users.findIndex((user: IBankUser) => this.contains(cardId, user.cards.map(x => x.id))) !== -1
 	}
 
-	private contains(item: any, items: any[]): boolean {
-		let index = items.findIndex(x => x === item);
-		return index != -1;
+	private contains(item: ICard, items: Array<ICard>): boolean {
+		const index = items.findIndex(x => x === item);
+		return index !== -1;
 	}
 } 
