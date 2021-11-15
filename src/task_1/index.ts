@@ -42,30 +42,30 @@ export class MoneyRepository {
             return false;
         }
 
-        let monetaryUnits: Array<IMoneyUnit> = [];
+        let moneyUnits: Array<IMoneyUnit> = [];
 
         for (const unit of this._repository) {
-            monetaryUnits.push(Object.assign({}, unit));
+            moneyUnits.push(Object.assign({}, unit));
         }
 
-        monetaryUnits = this._repository.filter( x => x.moneyInfo.currency === currency)
-        monetaryUnits = monetaryUnits.sort(function(x, y) {
+        moneyUnits = this._repository.filter( x => x.moneyInfo.currency === currency)
+        moneyUnits = moneyUnits.sort(function(x, y) {
             const a = Number(x.moneyInfo.denomination);
             const b = Number(y.moneyInfo.denomination);
 
             return b > a? 1: b < a ? -1: 0;
         })
 
-        monetaryUnits.forEach(monetaryUnit => {
-            const money = Number(monetaryUnit.moneyInfo.denomination)
+        moneyUnits.forEach(moneyUnit => {
+            const money = Number(moneyUnit.moneyInfo.denomination)
             const valueCount = Math.floor(count/money);
-            const rightCount = valueCount < monetaryUnit.count? valueCount: monetaryUnit.count;
+            const rightCount = valueCount < moneyUnit.count? valueCount: moneyUnit.count;
             count -= money * rightCount;  
-            monetaryUnit.count -= rightCount;
+            moneyUnit.count -= rightCount;
         });
 
         if (count !== 0) {
-            this._repository = monetaryUnits;
+            this._repository = moneyUnits;
 
             return false;   
         } 
@@ -73,9 +73,9 @@ export class MoneyRepository {
         return true;
     }
 
-    public takeMoney(monetaryUnits: IMoneyUnit[]): void {
-        for (const monetaryUnit of monetaryUnits) {
-            this._repository.push(monetaryUnit);
+    public takeMoney(moneyUnits: IMoneyUnit[]): void {
+        for (const moneyUnit of moneyUnits) {
+            this._repository.push(moneyUnit);
         }
     }
 }
