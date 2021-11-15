@@ -76,18 +76,19 @@ export class MoneyRepository {
         return sum === count;
     }
 
-    public takeMoney(moneyUnits: IMoneyUnit[]): void {
+    public takeMoney(moneyUnits: IMoneyUnit[]): boolean {
         for (let i = 0; i < moneyUnits.length; i++) {
             const curMoneyUnit: IMoneyUnit = this._repository.find
-            (moneyUnit =>
-                moneyUnit?.moneyInfo.denomination === moneyUnits[i].moneyInfo.denomination
+            (moneyUnit => moneyUnit?.moneyInfo.denomination === moneyUnits[i].moneyInfo.denomination
             && moneyUnit?.moneyInfo.currency === moneyUnits[i].moneyInfo.currency)
-            if (curMoneyUnit !== undefined) {
+            if (!curMoneyUnit) {
                 curMoneyUnit.count += moneyUnits[i].count;
             } else {
                 this._repository.push(moneyUnits[i]);
             }
         }
+
+        return true;
     }
 
     private sumMoney(currency: Currency) {
