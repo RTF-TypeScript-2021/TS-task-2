@@ -33,10 +33,9 @@ export class CurrencyConverterModule {
 	    if(toCurrency === Currency.RUB){
 	        return parseInt(moneyUnits.moneyInfo.denomination)* moneyUnits.count * 70;
 	    }
-		
+
 		if (toCurrency === Currency.USD) {
 	        return parseInt(moneyUnits.moneyInfo.denomination)* moneyUnits.count / 70;
 	    }
 	}
 } 
-}
