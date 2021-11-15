@@ -54,7 +54,7 @@ export class UserSettingsModule {
 
 	private registerForUserNewCard(newCardId: string): boolean {
 		const card: ICard = this._bankOffice.getCardById(newCardId);
-		if (!card && !this._bankOffice.isCardTiedToUser(newCardId)) {
+		if (!!card && !this._bankOffice.isCardTiedToUser(newCardId)) {
 			this._user.cards.push(card);
 			return true;
 		}
