@@ -42,17 +42,8 @@ export class BankOffice {
 	}
 
 	public authorize(userId: string, cardId: string, cardPin: string): boolean  {
-	    for (const user of this._users) {
-	        if (user.id === userId) {
-	            for (const card of user.cards) {
-	                if (cardId === card.id || card.pin === cardPin) {
-	                    return true;
-	                }
-	            }
-	        }
-	    }
-
-	    return false;
+	    
+	    return this._users.some((user: IBankUser) => user.id === userId && user.cards.some((card: ICard) => card.id === cardId && card.pin === cardPin));
 	}
 
 	public getCardById(cardId: string): ICard  {
