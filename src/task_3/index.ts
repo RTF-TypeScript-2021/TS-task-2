@@ -49,8 +49,15 @@ export class UserSettingsModule {
 	}
 
 	private registerForUserNewCard(newCardId: string): boolean {
-		return !!this._bankOffice.getCardById(newCardId)
-			&& this._user.cards.findIndex(card => card.id === newCardId) === -1;
+		const newCard = this._bankOffice.getCardById(newCardId);
+		if (!newCard){
+			return false;
+		}
+		if (this._user.cards.findIndex(card => card.id === newCardId) === -1) {
+			this._user.cards.push(newCard);
+			return true;
+		}
+		return false;
 	}
 
 	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {

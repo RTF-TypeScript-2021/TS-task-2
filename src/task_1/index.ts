@@ -37,7 +37,7 @@ export class MoneyRepository{
         this.moneyUnits = moneyUnits;
     }
 
-    public giveOutMoney(count: number, currency: Currency): Boolean {
+    public giveOutMoney(count: number, currency: Currency): boolean {
         const units :IMoneyUnit[] = this.moneyUnits
             .filter(x => x.moneyInfo.currency === currency)
             .sort((x, y) => Number(y.moneyInfo.denomination)- Number(x.moneyInfo.denomination));
