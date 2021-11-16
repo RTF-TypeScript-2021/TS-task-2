@@ -31,7 +31,7 @@ export interface IMoneyUnit {
 }
 
 export class MoneyRepository {
-    private _repository: IMoneyUnit[];
+    _repository: IMoneyUnit[];
 
     constructor(initialRepository: IMoneyUnit[]) {
         this._repository = initialRepository;
@@ -44,8 +44,8 @@ export class MoneyRepository {
             if(this._repository[i].moneyInfo.currency !== currency || denomination > count || this._repository[i].count === 0){
                 continue;
             }else{
-                const ost = count/denomination;
-                if (ost > this._repository[i].count){
+                const ost = Math.trunc(count/denomination);
+                if (ost >= this._repository[i].count){
                     count = count - this._repository[i].count*denomination;
                     this._repository[i].count = 0
                 }else{
