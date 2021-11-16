@@ -31,17 +31,57 @@ export interface IMoneyUnit {
 }
 
 export class MoneyRepository {
-    private _repository: any;
+    private _repository: Array<IMoneyUnit>;
 
-    constructor(initialRepository: any) {
+    constructor(initialRepository: Array<IMoneyUnit>) {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(count: number, currency: Currency): boolean {
+        if(this._repository.length === 0){
+            return false;
+        }
 
+        let moneyUnits: Array<IMoneyUnit> = [];
+
+        for (const unit of this._repository) {
+            moneyUnits.push(Object.assign({}, unit));
+        }
+
+        moneyUnits = this._repository.filter( x => x.moneyInfo.currency === currency)
+        moneyUnits = moneyUnits.sort(function(x, y) {
+            const a = Number(x.moneyInfo.denomination);
+            const b = Number(y.moneyInfo.denomination);
+
+            return b > a? 1: b < a ? -1: 0;
+        })
+
+        moneyUnits.forEach(moneyUnit => {
+            const money = Number(moneyUnit.moneyInfo.denomination)
+            const valueCount = Math.floor(count/money);
+            const rightCount = valueCount < moneyUnit.count? valueCount: moneyUnit.count;
+            count -= money * rightCount;  
+            moneyUnit.count -= rightCount;
+        });
+
+        if (count !== 0) {
+            this._repository = moneyUnits;
+
+            return false;   
+        } 
+
+        return true;
     }
+    public takeMoney(moneyUnits: Array<IMoneyUnit>): boolean {
 
-    public takeMoney(moneyUnits: any): any {
+        moneyUnits.forEach( unit => {
+            const flaq = this._repository.find( x => x.moneyInfo.denomination === unit.moneyInfo.denomination);
+            if (flaq === undefined){
+                return false;
+            }
+            flaq.count += unit.count;
+        })
 
+        return true;
     }
-}
+} 
