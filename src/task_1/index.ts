@@ -37,7 +37,7 @@ export class MoneyRepository {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(count: number, currency: Currency): boolean {
         if (this._repository.length === 0) {
             return false;
         }
@@ -73,9 +73,15 @@ export class MoneyRepository {
         return true;
     }
 
-    public takeMoney(moneyUnits: IMoneyUnit[]): void {
-        for (const moneyUnit of moneyUnits) {
-            this._repository.push(moneyUnit);
+    public takeMoney(moneyUnits: Array<IMoneyUnit>): void {
+        for (const moneyUnit of moneyUnits){
+            const unit = this._repository.find((unit: IMoneyUnit) => unit.moneyInfo.denomination === moneyUnit.moneyInfo.denomination);
+            if (unit) {
+                unit.count += moneyUnit.count;
+            }
+            else {
+                this._repository.push(moneyUnit);
+            }
         }
     }
 }
