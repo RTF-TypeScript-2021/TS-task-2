@@ -28,11 +28,13 @@ export class CurrencyConverterModule {
 	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
 		switch (fromCurrency) {
 			case toCurrency:
-				return 0;
+				return moneyUnits.count;
 			case Currency.USD:
 				return parseInt(moneyUnits.moneyInfo.denomination) * moneyUnits.count * 70;
 			case Currency.RUB:
 				return parseInt(moneyUnits.moneyInfo.denomination) * moneyUnits.count / 70;
+			default:
+				throw new Error('Ошибка перевода')
 		}
 
 	}
