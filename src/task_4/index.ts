@@ -27,8 +27,6 @@ export class CurrencyConverterModule {
 
 	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
 		switch (fromCurrency) {
-			case toCurrency:
-				return moneyUnits.count;
 			case Currency.USD:
 				return parseInt(moneyUnits.moneyInfo.denomination) * moneyUnits.count * 70;
 			case Currency.RUB:
