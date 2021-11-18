@@ -18,7 +18,7 @@
 */
 
 import {UserSettingOptions} from '../enums';
-import {BankOffice, IBankUser} from "../task_2";
+import {BankOffice, IBankUser, ICard} from "../task_2";
 
 export class UserSettingsModule {
 	private _bankOffice: BankOffice;
@@ -60,7 +60,15 @@ export class UserSettingsModule {
 		if (this._user === undefined) {
 			return false;
 		}
-		return this._bankOffice.getCardById(newCardId) !== undefined;
+		if (!this._bankOffice.isCardTiedToUser(newCardId)) {
+			let newCard: ICard;
+			newCard.id = newCardId;
+			this._user.cards.push(newCard);
+
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public changeUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
