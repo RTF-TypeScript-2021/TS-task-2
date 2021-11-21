@@ -69,8 +69,7 @@ export class MoneyRepository {
                 }
             }
             if (!canTake){
-                this._repository.push({ moneyInfo: { denomination: moneyUnits[j].moneyInfo.denomination,
-                    currency: moneyUnits[j].moneyInfo.currency }, count: moneyUnits[j].count });
+                this._repository.push(moneyUnits[j])
             }
         }
 
