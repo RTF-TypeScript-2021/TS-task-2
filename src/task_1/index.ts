@@ -31,17 +31,48 @@ export interface IMoneyUnit {
 }
 
 export class MoneyRepository {
-    private _repository: any;
+    private _repository: IMoneyUnit[];
 
-    constructor(initialRepository: any) {
+    constructor(initialRepository: IMoneyUnit[]) {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(count: number, currency: Currency): boolean {
+        this._repository.sort((x,y) => parseInt(y.moneyInfo.denomination) - parseInt(x.moneyInfo.denomination)); 
+        for(const obj of this._repository){
+            const denomination: number = parseInt(obj.moneyInfo.denomination);
+            if(obj.moneyInfo.currency !== currency || denomination > count || obj.count === 0){
+                continue;
+            }else{
+                const ost: number = count/denomination;
+                if (ost > obj.count){
+                    count -= obj.count * denomination;
+                    obj.count = 0;
+                }else{
+                    count -= ost*denomination;
+                    obj.count -= ost;
+                }
+            }
+        }
 
+        return count === 0;
     }
 
-    public takeMoney(moneyUnits: any): any {
+    public takeMoney(moneyUnits: IMoneyUnit[]): boolean {
+        for (let j = 0; j< moneyUnits.length; j++){
+            let canTake: boolean;
+            for (let i = 0; i < this._repository.length; i++) {
+                if (this._repository[i].moneyInfo.denomination === moneyUnits[j].moneyInfo.denomination
+                    && this._repository[i].moneyInfo.currency === moneyUnits[j].moneyInfo.currency) {
+                    this._repository[i].count += moneyUnits[j].count;
+                    canTake = true;
+                }
+            }
+            if (!canTake){
+                this._repository.push(moneyUnits[j])
+            }
+        }
 
+        return true;
     }
 }
