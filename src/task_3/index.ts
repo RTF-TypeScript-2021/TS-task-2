@@ -19,6 +19,7 @@
 
 import { UserSettingOptions } from '../enums';
 import { BankOffice, IBankUser, ICard} from '../task_2';
+import { Currency } from '../enums';
 
 export class UserSettingsModule {
     private _bankOffice: BankOffice;
@@ -28,22 +29,26 @@ export class UserSettingsModule {
         this._user = user;
     }
 
+    public get user() {
+        return this._user;
+    }
+
     constructor(initialBankOffice: BankOffice) {
         this._bankOffice = initialBankOffice;
     }
 
     private changeUserName(newName: string): boolean {
-        if (this._user.name === newName){
-            return false;
-        } else if(this.user.name === newName){
+        if (this.user && this.user.name !== newName) {
+            this.user.name = newName;
+
             return true;
-        } else {
-            return false;
         }
+        
+        return false;
     }
 
     private changeUserSurname(newSurname: string): boolean {
-        if (this.user.surname === newSurname){
+        if (this._user.surname === newSurname){
             return false;
         } else{
             this._user.surname = newSurname;
@@ -52,15 +57,21 @@ export class UserSettingsModule {
         }
     }
 
-    private registerForUserNewCard(newCardId: string): boolean {
+    private registerForUserNewCard(newCardId: string, currencyNewCard?: Currency, pinNewCard?: string): boolean {
         const BankHaveCard = this._bankOffice.getCardById(newCardId);
         if (BankHaveCard === undefined || this._bankOffice.isCardTiedToUser(newCardId)) {
             return false;
         }
-        let newCard: ICard
-        newCard.id = newCardId;
+        const newCard: ICard = {
+            id : newCardId,
+            balance: 0,
+            currency: currencyNewCard,
+            pin: pinNewCard
+        }
 
-        this._user.cards.push(newCard);
+        //Нужно еще запросить ввести currency и pin
+        
+        this.user.cards.push(newCard);
 
         return true;
     }

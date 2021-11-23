@@ -17,10 +17,9 @@
  * 2) Типизировать все свойства и методы класса MoneyRepository,
  *      пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
  */
-
 import { Currency } from '../enums';
 
-interface IMoneyInfo {
+ interface IMoneyInfo {
     denomination: string | number;
     currency: Currency;
 }
@@ -54,14 +53,14 @@ export class MoneyRepository {
             const checkAvailable = Math.floor(count/denominationNumber);
             if(checkAvailable <= moneyUnit.count){
                 count -= denominationNumber * checkAvailable;
-                //moneyUnit.count -= checkAvailable;
+                moneyUnit.count -= checkAvailable;
             } else {
                 count -= denominationNumber * moneyUnit.count;
-                //moneyUnit.count -= moneyUnit.count;
+                moneyUnit.count -= moneyUnit.count;
             }
 
         })
-        
+
         if (count === 0) {
             return true;
         } else {
@@ -71,11 +70,11 @@ export class MoneyRepository {
 
     public takeMoney(moneyUnits: Array<IMoneyUnit>): void {
         for(const unit of moneyUnits){
-            if(!this._repository.find(el => el.moneyInfo.denomination=== unit.moneyInfo.denomination)){
+            const checkExistence = this._repository.find(el => el.moneyInfo.denomination === unit.moneyInfo.denomination);
+            if(checkExistence === undefined){
                 this._repository.push(unit);
-            } else{
-                const indexCurrency = this._repository.findIndex(el => el.moneyInfo.currency === unit.moneyInfo.currency);
-                this._repository[indexCurrency].count += unit.count;
+            } else {
+                checkExistence.count += unit.count;
             }
             
         }
