@@ -42,7 +42,7 @@ export class MoneyRepository {
             return false;
         }
 
-        let denominationAll = this._repository.filter(unit => unit.moneyInfo.currency === currency).sort(function(unit, anotherUnit) {
+        const denominationAll = this._repository.filter(unit => unit.moneyInfo.currency === currency).sort(function(unit, anotherUnit) {
             const a = Number(unit.moneyInfo.denomination);
             const b = Number(anotherUnit.moneyInfo.denomination);
 
@@ -54,10 +54,10 @@ export class MoneyRepository {
             const checkAvailable = Math.floor(count/denominationNumber);
             if(checkAvailable <= moneyUnit.count){
                 count -= denominationNumber * checkAvailable;
-                moneyUnit.count -= checkAvailable;
+                //moneyUnit.count -= checkAvailable;
             } else {
                 count -= denominationNumber * moneyUnit.count;
-                moneyUnit.count -= moneyUnit.count;
+                //moneyUnit.count -= moneyUnit.count;
             }
 
         })
@@ -71,7 +71,13 @@ export class MoneyRepository {
 
     public takeMoney(moneyUnits: Array<IMoneyUnit>): void {
         for(const unit of moneyUnits){
-            this._repository.push(unit);
+            if(!this._repository.find(el => el.moneyInfo.denomination=== unit.moneyInfo.denomination)){
+                this._repository.push(unit);
+            } else{
+                const indexCurrency = this._repository.findIndex(el => el.moneyInfo.currency === unit.moneyInfo.currency);
+                this._repository[indexCurrency].count += unit.count;
+            }
+            
         }
     }
 }

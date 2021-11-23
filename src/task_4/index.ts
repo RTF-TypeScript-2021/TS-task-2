@@ -19,23 +19,23 @@ import { Currency } from '../enums';
 import { IMoneyUnit, MoneyRepository } from '../task_1';
 
 export class CurrencyConverterModule {
-	private _moneyRepository: MoneyRepository;
+     protected _moneyRepository: MoneyRepository;
 
-	constructor(initialMoneyRepository: any) {
-		this._moneyRepository = initialMoneyRepository;
-	}
+     constructor(initialMoneyRepository: MoneyRepository) {
+         this._moneyRepository = initialMoneyRepository;
+     }
 
-	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): Number {
-		const moneySum = moneyUnits.count * Number(moneyUnits.moneyInfo.denomination);
-		if (fromCurrency === Currency.RUB && toCurrency === Currency.USD && moneySum % 70 === 0) {
-		
-				return moneySum / 70;
-		} else if (fromCurrency === Currency.USD && toCurrency === Currency.RUB) {
+     public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
+         const moneySum = moneyUnits.count * Number(moneyUnits.moneyInfo.denomination);
+         if (fromCurrency === Currency.RUB && toCurrency === Currency.USD && moneySum % 70 === 0) {
+          
+             return moneySum / 70;
+         } else if (fromCurrency === Currency.USD && toCurrency === Currency.RUB) {
 
-				return moneySum * 70;
-		} else{
+             return moneySum * 70;
+         } else{
 
-			return 0;
-		}
-	}
+             return 0;
+         }
+     }
 }
