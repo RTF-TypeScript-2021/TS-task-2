@@ -22,87 +22,86 @@ import { UserSettingsModule } from '../task_3';
 import { CurrencyConverterModule } from '../task_4';
 
 export class BankTerminal {
-	private _bankOffice: BankOffice;
-	private _moneyRepository: MoneyRepository;
-	private _userSettingsModule: UserSettingsModule;
-	private _currencyConverterModule: CurrencyConverterModule;
-	private _authorizedUser: IBankUser;
-	private _activeUserCard: ICard;
+    private _bankOffice: BankOffice;
+    private _moneyRepository: MoneyRepository;
+    private _userSettingsModule: UserSettingsModule;
+    private _currencyConverterModule: CurrencyConverterModule;
+    private _authorizedUser: IBankUser;
+    private _activeUserCard: ICard;
 
-	constructor(initBankOffice: BankOffice, initMoneyRepository: MoneyRepository) {
-		this._moneyRepository = initMoneyRepository;
-		this._bankOffice = initBankOffice;
-		this._userSettingsModule = new UserSettingsModule(initBankOffice);
-		this._currencyConverterModule = new CurrencyConverterModule(initMoneyRepository);
-	}
+    constructor(initBankOffice: BankOffice, initMoneyRepository: MoneyRepository) {
+        this._moneyRepository = initMoneyRepository;
+        this._bankOffice = initBankOffice;
+        this._userSettingsModule = new UserSettingsModule(initBankOffice);
+        this._currencyConverterModule = new CurrencyConverterModule(initMoneyRepository);
+    }
 
-	public authorizeUser(user: IBankUser, card: ICard, cardPin: string): boolean {
-		if (this._bankOffice.authorize(user.id, card.id, cardPin)) {
-			this._authorizedUser = user;
-			this._activeUserCard = card;
-			this._userSettingsModule.user = this._authorizedUser;
-			
-			return true;
-		} else {
-			this._authorizedUser = undefined;
-			this._activeUserCard = undefined;
-			
-			return false;
-		}
-	}
+    public authorizeUser(user: IBankUser, card: ICard, cardPin: string): boolean {
+        if (this._bankOffice.authorize(user.id, card.id, cardPin)) {
+            this._authorizedUser = user;
+            this._activeUserCard = card;
+            this._userSettingsModule.user = this._authorizedUser;
+            
+            return true;
+        } else {
+            this._authorizedUser = undefined;
+            this._activeUserCard = undefined;
+            
+            return false;
+        }
+    }
 
-	public takeUsersMoney(moneyUnits: Array<IMoneyUnit>): boolean {
-		if (this._authorizedUser) {
-			//TODO: если монеты могут быть разными, то что с ними делать
-			//1 - можно переводить деньги в валюты текущего кошелька
-			//2 - не передавать их и пусть кладет на другую карту
-			const cashReceipt = moneyUnits.reduce((acc,unit) => {
-				let totalDenomination = unit.count*Number(unit.moneyInfo.denomination);
-				if (unit.moneyInfo.currency !== this._activeUserCard.currency){
-					totalDenomination = this._currencyConverterModule.convertMoneyUnits(
-						unit.moneyInfo.currency, this._activeUserCard.currency, unit
-					)
-				}
+    public takeUsersMoney(moneyUnits: Array<IMoneyUnit>): boolean {
+        if (this._authorizedUser) {
+            //TODO: если монеты могут быть разными, то что с ними делать
+            //1 - можно переводить деньги в валюты текущего кошелька
+            //2 - не передавать их и пусть кладет на другую карту
+            const cashReceipt = moneyUnits.reduce((acc,unit) => {
+                let totalDenomination = unit.count*Number(unit.moneyInfo.denomination);
+                if (unit.moneyInfo.currency !== this._activeUserCard.currency){
+                    totalDenomination = this._currencyConverterModule.convertMoneyUnits(
+                        unit.moneyInfo.currency, this._activeUserCard.currency, unit
+                    )
+                }
 
-				return acc + totalDenomination;
-			}, 0);
-			this._activeUserCard.balance += cashReceipt;
-			this._moneyRepository.takeMoney(moneyUnits);
+                return acc + totalDenomination;
+            }, 0);
+            this._activeUserCard.balance += cashReceipt;
+            this._moneyRepository.takeMoney(moneyUnits);
 
-			return true;
-		} else {
-			return false;
-		}
-	}
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	public giveOutUsersMoney(count: number): boolean {
-		if (this._authorizedUser && this._activeUserCard.balance >= count &&
-			this._moneyRepository.giveOutMoney(count, this._activeUserCard.currency)
-			) {
-			this._activeUserCard.balance -= count;
+    public giveOutUsersMoney(count: number): boolean {
+        if (this._authorizedUser && this._activeUserCard.balance >= count &&
+            this._moneyRepository.giveOutMoney(count, this._activeUserCard.currency)) {
+            this._activeUserCard.balance -= count;
 
-			return true;
-		}
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public changeAuthorizedUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
-		if (this._authorizedUser) {
-			return this._userSettingsModule.changeUserSettings(option, argsForChangeFunction);
-		} else {
-			return false;
-		}
-		
-	}
+    public changeAuthorizedUserSettings(option: UserSettingOptions, argsForChangeFunction: string): boolean {
+        if (this._authorizedUser) {
+            return this._userSettingsModule.changeUserSettings(option, argsForChangeFunction);
+        } else {
+            return false;
+        }
+        
+    }
 
-	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnit: IMoneyUnit): number {
-		//Не поняв, а нужно принять одну валюту и вернуть другию тип. После чего обновить данные в
-		// текущем терминале
-		if (this._authorizedUser) {
-			return this._currencyConverterModule.convertMoneyUnits(fromCurrency, toCurrency, moneyUnit);
-		} else {
-			return 0;
-		}
-	}
+    public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnit: IMoneyUnit): number {
+        //Не поняв, а нужно принять одну валюту и вернуть другию тип. После чего обновить данные в
+        // текущем терминале
+        if (this._authorizedUser) {
+            return this._currencyConverterModule.convertMoneyUnits(fromCurrency, toCurrency, moneyUnit);
+        } else {
+            return 0;
+        }
+    }
 }

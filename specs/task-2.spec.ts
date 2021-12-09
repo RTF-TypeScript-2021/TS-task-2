@@ -52,6 +52,8 @@ test('Authorize works correct', () => {
     expect(bank.authorize("1", "003", "0000")).toBe(true);
     expect(bank.authorize("2", "001", "0000")).toBe(false);
     expect(bank.authorize("2", "002", "1488")).toBe(false);
+    //Если пользователь не существует
+    expect(bank.authorize("5", "002", "1488")).toBe(false);
 });
 
 test('getCardById works correct', () => {

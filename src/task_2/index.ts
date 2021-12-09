@@ -18,49 +18,49 @@
 import { Currency } from '../enums';
 
 export interface ICard {
-	id: string;
-	balance: number;
-	currency: Currency,
-	pin: string,
+    id: string;
+    balance: number;
+    currency: Currency,
+    pin: string,
 }
 
 export interface IBankUser {
-	id: string;
-	name: string;
-	surname: string;
-	cards: Array<ICard>;
+    id: string;
+    name: string;
+    surname: string;
+    cards: Array<ICard>;
 }
 
 export class BankOffice {
-	private _users: Array<IBankUser>;
-	private _cards: Array<ICard>;
+    private _users: Array<IBankUser>;
+    private _cards: Array<ICard>;
 
-	constructor(users: Array<IBankUser>, cards: Array<ICard>) {
-		this._users = users;
-		this._cards = cards;
-	}
+    constructor(users: Array<IBankUser>, cards: Array<ICard>) {
+        this._users = users;
+        this._cards = cards;
+    }
 
-	public authorize(userId: string, cardId: string, cardPin: string): boolean {
-		const user:IBankUser = this._users.find(user => user.id === userId);
-		const card:ICard = user ? user.cards.find(
-			card => ( card.id === cardId) &&
-			card.pin === cardPin
-		) : undefined;
+    public authorize(userId: string, cardId: string, cardPin: string): boolean {
+        const user:IBankUser = this._users.find(user => user.id === userId);
+        const card:ICard = user?.cards.find(
+            card => ( card.id === cardId) &&
+            card.pin === cardPin
+        );
 
-		return card ? true : false;
-	}
+        return !!card;
+    }
 
-	public getCardById(cardId: string): ICard {
-		return this._cards.find(card => card.id === cardId);
-	}
+    public getCardById(cardId: string): ICard {
+        return this._cards.find(card => card.id === cardId);
+    }
 
-	public isCardTiedToUser(cardId: string): boolean {
-		const user = this._users.find(user => 
-			user.cards.some(card =>
-				card.id === cardId
-			)
-		);
+    public isCardTiedToUser(cardId: string): boolean {
+        const user = this._users.find(user => 
+            user.cards.some(card =>
+                card.id === cardId
+            )
+        );
 
-		return user ? true : false;
-	}
+        return user ? true : false;
+    }
 }

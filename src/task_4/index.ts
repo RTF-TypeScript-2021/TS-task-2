@@ -19,26 +19,26 @@ import { Currency } from '../enums';
 import { IMoneyUnit, MoneyRepository } from '../task_1';
 
 export class CurrencyConverterModule {
-	private _moneyRepository: MoneyRepository;
-	private static _exchangeRate: {[key: string] : number} = {
-		'USDRUB' : 70,
-		'RUBUSD' : 1/70,
-	}
-	constructor(initialMoneyRepository: MoneyRepository) {
-		this._moneyRepository = initialMoneyRepository; 
-	}
+    private _moneyRepository: MoneyRepository;
+    private static _exchangeRate: { [key: string]: number } = {
+        'USDRUB': 70,
+        'RUBUSD': 1 / 70,
+    }
+    constructor(initialMoneyRepository: MoneyRepository) {
+        this._moneyRepository = initialMoneyRepository;
+    }
 
-	public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
-		if (fromCurrency === toCurrency || moneyUnits.moneyInfo.currency !== fromCurrency) {
-			return 0;
-		} else {
-			const coefficient : number = CurrencyConverterModule
-				._exchangeRate[Currency[fromCurrency]+Currency[toCurrency]];
-			const result:string = (coefficient * moneyUnits.count * Number(
-				moneyUnits.moneyInfo.denomination)
-				).toFixed(5);
-			
-			return parseFloat(result);
-		}
-	}
+    public convertMoneyUnits(fromCurrency: Currency, toCurrency: Currency, moneyUnits: IMoneyUnit): number {
+        if (fromCurrency === toCurrency || moneyUnits.moneyInfo.currency !== fromCurrency) {
+            return 0;
+        } else {
+            const coefficient: number = CurrencyConverterModule
+                ._exchangeRate[Currency[fromCurrency] + Currency[toCurrency]];
+            const result: string = (coefficient * moneyUnits.count * Number(
+                moneyUnits.moneyInfo.denomination)
+            ).toFixed(5);
+
+            return parseFloat(result);
+        }
+    }
 }
