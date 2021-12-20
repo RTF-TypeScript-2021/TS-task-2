@@ -67,7 +67,6 @@ export class UserSettingsModule {
 				balance: 0,
 				currency: Currency.RUB,
 				pin: "0000" };
-	        newCard.id = newCardId;
 	        this._user.cards.push(newCard);
 
 	        return true;
