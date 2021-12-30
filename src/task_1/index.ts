@@ -31,17 +31,48 @@ export interface IMoneyUnit {
 }
 
 export class MoneyRepository {
-    private _repository: any;
+    _repository: IMoneyUnit[];
 
-    constructor(initialRepository: any) {
+    constructor(initialRepository: IMoneyUnit[]) {
         this._repository = initialRepository;
     }
 
-    public giveOutMoney(count: any, currency: any): any {
+    public giveOutMoney(count: number, currency: Currency): boolean {
+        this._repository.sort((a,b) => parseInt(b.moneyInfo.denomination) - parseInt(a.moneyInfo.denomination))
+        for(let i = 0; i < this._repository.length; i++){
+            const denomination = parseInt(this._repository[i].moneyInfo.denomination);
+            if(this._repository[i].moneyInfo.currency !== currency || denomination > count || this._repository[i].count === 0){
+                continue;
+            }else{
+                const ost = Math.trunc(count/denomination);
+                if (ost >= this._repository[i].count){
+                    count = count - this._repository[i].count*denomination;
+                    this._repository[i].count = 0
+                }else{
+                    count = count - ost*denomination;
+                    this._repository[i].count -= ost
+                }
+            }
+        }
 
+        return count === 0;
     }
 
-    public takeMoney(moneyUnits: any): any {
+    public takeMoney(moneyUnits: IMoneyUnit[]): boolean {
+        for (let j = 0; j< moneyUnits.length; j++){
+            let canTake = false
+            for (let i = 0; i < this._repository.length; i++) {
+                if (this._repository[i].moneyInfo.currency === moneyUnits[j].moneyInfo.currency
+                    && this._repository[i].moneyInfo.denomination === moneyUnits[j].moneyInfo.denomination) {
+                    this._repository[i].count += moneyUnits[j].count
+                    canTake = true
+                }
+            }
+            if (!canTake){
+                this._repository.push({ moneyInfo: { denomination: moneyUnits[j].moneyInfo.denomination, currency: moneyUnits[j].moneyInfo.currency }, count: moneyUnits[j].count })
+            }
+        }
 
+        return true
     }
 }
