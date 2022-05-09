@@ -32,23 +32,23 @@ export interface IBankUser {
 }
 
 export class BankOffice {
-	private _users: any;
-	private _cards: any;
+	private _users: IBankUser[];
+	private _cards: ICard[];
 
-	constructor(users: any, cards: any) {
-		this._users = users;
-		this._cards = cards;
+	constructor(users: IBankUser[], cards: ICard[]) {
+        this._users = users;
+        this._cards = cards;
 	}
 
-	public authorize(userId: any, cardId: any, cardPin: any): any {
-
+	public authorize(userId: string, cardId: string, cardPin: string): boolean {
+		return this._users.find(u => u.id === userId && u.cards.find(c => c.id === cardId && c.pin === cardPin)) !== undefined;
 	}
 
-	public getCardById(cardId: any): any {
-
+	public getCardById(cardId: string): ICard {
+		return this._cards.find(c => c.id === cardId);
 	}
 
-	public isCardTiedToUser(cardId: any): any {
-
+	public isCardTiedToUser(cardId: string): boolean {
+		return this._users.find(u => u.cards.map(c => c.id).includes(cardId)) !== undefined;
 	}
 }
