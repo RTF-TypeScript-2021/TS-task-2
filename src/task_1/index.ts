@@ -18,30 +18,49 @@
  *      пользуясь уже предоставленными интерфейсами (избавиться от всех any типов)
  */
 
-import { Currency } from '../enums';
+ import { Currency } from '../enums';
 
-interface IMoneyInfo {
-    denomination: string;
-    currency: Currency;
-}
-
-export interface IMoneyUnit {
-    moneyInfo: IMoneyInfo;
-    count: number;
-}
-
-export class MoneyRepository {
-    private _repository: any;
-
-    constructor(initialRepository: any) {
-        this._repository = initialRepository;
-    }
-
-    public giveOutMoney(count: any, currency: any): any {
-
-    }
-
-    public takeMoney(moneyUnits: any): any {
-
-    }
-}
+ interface IMoneyInfo {
+     denomination: string;
+     currency: Currency;
+ }
+ 
+ export interface IMoneyUnit {
+     moneyInfo: IMoneyInfo;
+     count: number;
+ }
+ 
+ export class MoneyRepository {
+     private _repository: IMoneyUnit[];
+ 
+     constructor(initialRepository: IMoneyUnit[]) {
+         this._repository = initialRepository;
+     }
+ 
+     public giveOutMoney(count: number, currency: Currency): boolean  {
+         const moneyUnits = this._repository.filter(x => x.moneyInfo.currency === currency)
+             .sort((b, a) => {
+                 const l = a.moneyInfo.denomination.length - b.moneyInfo.denomination.length;
+ 
+                 return l !== 0 ? l : a.moneyInfo.denomination.localeCompare(b.moneyInfo.denomination);
+             });
+         
+         moneyUnits.forEach(moneyUnit =>{
+             const denomination: number = parseInt(moneyUnit.moneyInfo.denomination);
+             if (count >= denomination){
+                 const billNumber = Math.min(Math.floor(count / denomination), moneyUnit.count);
+                 moneyUnit.count -= billNumber;
+                 count -= billNumber * denomination;
+             }
+         });
+         
+         return count === 0;
+     }
+ 
+     public takeMoney(moneyUnits: IMoneyUnit[]): void {
+         moneyUnits.forEach(moneyUnit => {
+             this._repository.find(x => x.moneyInfo.currency === moneyUnit.moneyInfo.currency 
+                 && x.moneyInfo.denomination === moneyUnit.moneyInfo.denomination).count += moneyUnit.count;
+         });
+     }
+ }
